@@ -2,6 +2,12 @@
 
 #define CLASS_ESP8266 "82"
 
+#define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
+
+#ifndef DEEP_SLEEP_SUPPLEMENT_SECS
+#define DEEP_SLEEP_SUPPLEMENT_SECS 60
+#endif // DEEP_SLEEP_SUPPLEMENT_SECS
+
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
@@ -10,9 +16,10 @@ int httpPost(const char *url, const char *body, ParamStream *response, Table *he
 bool readFile(const char *fname, Buffer *content);
 bool writeFile(const char *fname, const char *content);
 void updateFirmwareVersion(const char *url, const char *projVersion);
-bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs);
-bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
+bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)());
+bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)());
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
+void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
 WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
   int n = WiFi.scanNetworks();
@@ -35,13 +42,13 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
   log(CLASS_ESP8266, Info, "Init wifi '%s' (or '%s')...", ssid, ssidb);
   bool wifiIsOff = (wifi_get_opmode() == NULL_MODE);
   if (wifiIsOff) {
-    log(CLASS_MAIN, Debug, "Wifi off, turning on...");
+    log(CLASS_ESP8266, Debug, "Wifi off, turning on...");
     wifi_fpm_do_wakeup();
     wifi_fpm_close();
     wifi_set_opmode(STATION_MODE);
     wifi_station_connect();
   } else {
-    log(CLASS_MAIN, Debug, "Wifi on already");
+    log(CLASS_ESP8266, Debug, "Wifi on already");
   }
 
   if (skipIfConnected) { // check if connected
@@ -74,7 +81,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
 
   int attemptsLeft = retries;
   while (true) {
-    bool interrupt = lightSleepInterruptable(now(), WIFI_DELAY_MS / 1000);
+    bool interrupt = lightSleepNotInterruptable(now(), WIFI_DELAY_MS / 1000, NULL);
     if (interrupt) {
       log(CLASS_ESP8266, Warn, "Wifi init interrupted");
       return false; // not connected
@@ -234,30 +241,24 @@ void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   Timing t = Timing();
   time_t n = now();
 
-  // light sleep to allow user intervention
-  bool inte = lightSleepInterruptable(n, PRE_DEEP_SLEEP_WINDOW_SECS);
-
   // calculate time to boot regularly at the same moments
   t.setCurrentTime(n);
   t.setFreqEverySecs((int)periodSecs);
   time_t toSleepSecs = t.secsToMatch(MAX_DEEP_SLEEP_PERIOD_SECS);
 
-  if (!inte) {
-    // if no intervention, deep sleep
-    deepSleepNotInterruptableSecs(n, toSleepSecs + DEEP_SLEEP_SUPPLEMENT_SECS);
-  }
+  deepSleepNotInterruptableSecs(n, toSleepSecs + DEEP_SLEEP_SUPPLEMENT_SECS);
 }
 
-bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec) {
+bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
   log(CLASS_ESP8266, Debug, "Light Sleep(%ds)...", (int)periodSecs);
-  if (haveToInterrupt()) { // first quick check before any time considerations
+  if (interrupt()) { // first quick check before any time considerations
     return true;
   }
   while (now() < cycleBegin + periodSecs) {
-    if (haveToInterrupt()) {
+    if (interrupt()) {
       return true;
     }
-    heartbeat();
+    if (heartbeat) heartbeat();
     delay(miniPeriodMsec);
   }
   return false;
@@ -265,7 +266,7 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
 
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t p = (periodSecs > MAX_DEEP_SLEEP_PERIOD_SECS ? MAX_DEEP_SLEEP_PERIOD_SECS : periodSecs);
-  log(CLASS_MAIN, Debug, "Deep Sleep(%ds)...", (int)p);
+  log(CLASS_ESP8266, Debug, "Deep Sleep(%ds)...", (int)p);
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {
@@ -274,11 +275,11 @@ void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   }
 }
 
-bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec) {
+bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)()) {
   log(CLASS_ESP8266, Debug, "Light Sleep(%ds)...", (int)periodSecs);
   while (now() < cycleBegin + periodSecs) {
-    heartbeat();
-    delay(miniPeriodMsec);
+    if (heartbeat) heartbeat();
+    delay(1000);
   }
   return false;
 }
