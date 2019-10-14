@@ -2,6 +2,8 @@
 
 #define CLASS_X8664 "64"
 
+#include <log4ino/Log.h>
+
 #include <cstdio>
 #include <iostream>
 #include <stdio.h>

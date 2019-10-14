@@ -2,6 +2,13 @@
 
 #define COMMON_INC
 
+#include <main4ino/Table.h>
+#include <main4ino/ParamStream.h>
+#include <main4ino/Buffer.h>
+#include <main4ino/HttpCodes.h>
+
+enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
+
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();

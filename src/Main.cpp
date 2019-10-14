@@ -25,9 +25,9 @@
 #include <X86_64.h>
 #endif
 
-void main() {
+int main() {
+  return 0;
 }
 
 #endif // ARDUINO
 
-}

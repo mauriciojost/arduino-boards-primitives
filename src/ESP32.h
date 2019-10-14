@@ -2,6 +2,8 @@
 
 #define CLASS_ESP32 "32"
 
+#include <log4ino/Log.h>
+
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
 
 #ifndef DEEP_SLEEP_SUPPLEMENT_SECS
