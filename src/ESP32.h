@@ -3,6 +3,16 @@
 #define CLASS_ESP32 "32"
 
 #include <log4ino/Log.h>
+#include <main4ino/Timing.h>
+#include <Arduino.h>
+#include <ArduinoOTA.h>
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
+#include <SPIFFS.h>
+//#include <EspSaveCrash.h> // not found for esp32 yet
+#include <FS.h>
+#include "Common.h"
+
 
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
 
@@ -10,7 +20,17 @@
 #define DEEP_SLEEP_SUPPLEMENT_SECS 60
 #endif // DEEP_SLEEP_SUPPLEMENT_SECS
 
-#include "Common.h"
+#ifndef WIFI_DELAY_MS
+#define WIFI_DELAY_MS 2000
+#endif // WIFI_DELAY_MS
+
+#ifndef URL_PRINT_MAX_LENGTH
+#define URL_PRINT_MAX_LENGTH 20
+#endif // URL_PRINT_MAX_LENGTH
+
+#define WAIT_BEFORE_HTTP_MS 100
+
+HTTPClient httpClient;
 
 WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
   int n = WiFi.scanNetworks();
@@ -183,16 +203,8 @@ bool writeFile(const char *fname, const char *content) {
   return success;
 }
 
-void updateFirmwareVersion(const char *url, const char *projVersion) {
+void updateFirmwareVersion(const char *url, const char *projVersion) { // already connected to wifi
   HTTPUpdate updater;
-
-  Settings *s = m->getModuleSettings();
-  bool connected = initWifi(s->getSsid(), s->getPass(), false, 10);
-  if (!connected) {
-    log(CLASS_ESP32, Error, "Cannot connect to wifi");
-    m->getNotifier()->message(0, USER_LCD_FONT_SIZE, "Cannot connect to wifi: %s", s->getSsid());
-    return; // fail fast
-  }
 
   log(CLASS_ESP32, Warn, "Current firmware '%s'", projVersion);
   log(CLASS_ESP32, Warn, "Updating firmware from '%s'...", url);
@@ -239,7 +251,7 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
 
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t p = (periodSecs > MAX_DEEP_SLEEP_PERIOD_SECS ? MAX_DEEP_SLEEP_PERIOD_SECS : periodSecs);
-  log(CLASS_MAIN, Debug, "Deep Sleep(%ds)...", (int)p);
+  log(CLASS_ESP32, Debug, "Deep Sleep(%ds)...", (int)p);
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {

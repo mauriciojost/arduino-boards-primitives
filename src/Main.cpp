@@ -9,6 +9,7 @@
 
 #include <Main.h>
 
+
 #ifdef ARDUINO
 
 #ifdef ESP8266 // on ESP8266
@@ -17,17 +18,35 @@
 
 #ifdef ESP32 // on ESP32
 #include <ESP32.h>
+#ifdef DUMMY_SETUP_AND_INIT
+void setup(void);
+void loop(void);
+#endif // SETUP_AND_INIT_PROVIDED
+
 #endif // ESP32
 
 #else // ARDUINO
 
 #ifdef X86_64 // on PC
 #include <X86_64.h>
+#ifdef DUMMY_SETUP_AND_INIT
+void setup(void);
+void loop(void);
+#endif // SETUP_AND_INIT_PROVIDED
+
 #endif
 
 int main() {
+  setup();
+  loop();
   return 0;
 }
 
 #endif // ARDUINO
+
+#ifdef DUMMY_SETUP_AND_INIT
+void setup() {}
+void loop() {}
+#endif // SETUP_AND_INIT_PROVIDED
+
 

@@ -20,41 +20,17 @@ pipeline {
             }
           }
         }
-        stage('Test') {
-          steps {
-            wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-              sh './launch_tests'
-            }
-          }
-        }
         stage('Artifact') {
           steps {
             wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-              sh './upload -n esp8266 -p profiles/generic.prof -e' // shared volume with docker container
-              sh './upload -n esp32 -p profiles/generic.prof -e' // shared volume with docker container
+              sh './upload -n esp8266 -p profiles/test.prof -e' // shared volume with docker container
+              sh './upload -n esp32 -p profiles/test.prof -e' // shared volume with docker container
+              sh './upload -n x86_64 -p profiles/test.prof'
             }
           }
         }
       }
 
-      post {  
-        success {  
-          cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage.xml', conditionalCoverageTargets: '70, 0, 0', enableNewApi: true, failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
-        }  
-      }
-
-    }
-    stage('Publish') {
-      agent any
-      stages {
-        stage('Publish') {
-          steps {
-            wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
-              sh 'bash ./misc/scripts/expose-artifacts'
-            }
-          }
-        }
-      }
     }
   }
 
