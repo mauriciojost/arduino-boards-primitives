@@ -7,7 +7,7 @@
  * The rest should be put in Module so that they can be tested regardless of the HW used behind.
  */
 
-#include <Main.h>
+#include <CompilationTest.h>
 
 
 #ifdef ARDUINO

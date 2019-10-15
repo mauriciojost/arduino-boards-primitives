@@ -1,6 +1,6 @@
-#ifndef COMMON_INC
+#ifndef BOARDS_INC
 
-#define COMMON_INC
+#define BOARDS_INC
 
 #include <main4ino/Table.h>
 #include <main4ino/ParamStream.h>
@@ -22,4 +22,4 @@ bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*hea
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
-#endif // COMMON_INC
+#endif // BOARDS_INC
