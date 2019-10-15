@@ -13,11 +13,11 @@
 #ifdef ARDUINO
 
 #ifdef ESP8266 // on ESP8266
-#include <ESP8266.h>
+#include <primitives/BoardESP8266.h>
 #endif // ESP8266
 
 #ifdef ESP32 // on ESP32
-#include <ESP32.h>
+#include <primitives/BoardESP32.h>
 #ifdef DUMMY_SETUP_AND_INIT
 void setup(void);
 void loop(void);
@@ -28,7 +28,7 @@ void loop(void);
 #else // ARDUINO
 
 #ifdef X86_64 // on PC
-#include <X86_64.h>
+#include <primitives/BoardX86_64.h>
 #ifdef DUMMY_SETUP_AND_INIT
 void setup(void);
 void loop(void);
