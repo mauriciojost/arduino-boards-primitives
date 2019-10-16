@@ -32,7 +32,7 @@ bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*hea
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
-void updateFirmware(const char *project, const char* platform, const char *projVersion) {
+void updateFirmware(const char *project, const char* platform, const char *version) {
   Buffer aux(128);
   aux.fill(FIRMWARE_UPDATE_URL, project, platform, version);
   updateFirmware(aux.getBuffer());

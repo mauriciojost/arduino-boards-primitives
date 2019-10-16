@@ -216,13 +216,12 @@ bool writeFile(const char *fname, const char *content) {
   return success;
 }
 
-void updateFirmwareVersion(const char *url, const char *projVersion) { // already connected to wifi
+void updateFirmware(const char *url) { // already connected to wifi
   ESP8266HTTPUpdate updater;
 
-  log(CLASS_ESP8266, Warn, "Current firmware '%s'", projVersion);
   log(CLASS_ESP8266, Warn, "Updating firmware from '%s'...", url);
 
-  t_httpUpdate_return ret = updater.update(url, projVersion);
+  t_httpUpdate_return ret = updater.update(url);
   switch (ret) {
     case HTTP_UPDATE_FAILED:
       log(CLASS_ESP8266,
