@@ -203,12 +203,12 @@ bool writeFile(const char *fname, const char *content) {
   return success;
 }
 
-void updateFirmware(const char *url) { // already connected to wifi
+void updateFirmware(const char *url, const char *currentVersion) { // already connected to wifi
   HTTPUpdate updater;
 
   log(CLASS_ESP32, Warn, "Updating firmware from '%s'...", url);
 
-  t_httpUpdate_return ret = updater.update(httpClient.getStream(), url);
+  t_httpUpdate_return ret = updater.update(httpClient.getStream(), url, currentVersion);
   switch (ret) {
     case HTTP_UPDATE_FAILED:
       log(CLASS_ESP32, Error, "HTTP_UPDATE_FAILD Error (%d): %s\n", updater.getLastError(), updater.getLastErrorString().c_str());

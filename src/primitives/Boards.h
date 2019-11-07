@@ -27,16 +27,16 @@ int httpGet(const char *url, ParamStream *response, Table *headers);
 int httpPost(const char *url, const char *body, ParamStream *response, Table *headers);
 bool readFile(const char *fname, Buffer *content);
 bool writeFile(const char *fname, const char *content);
-void updateFirmware(const char *url);
+void updateFirmware(const char *url, const char *currentVersion);
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)());
 bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)());
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
-void updateFirmware(const char *project, const char* platform, const char *version) {
+void updateFirmware(const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
   Buffer aux(128);
-  aux.fill(FIRMWARE_UPDATE_URL, project, version, platform);
-  updateFirmware(aux.getBuffer());
+  aux.fill(FIRMWARE_UPDATE_URL, project, targetVersion, platform);
+  updateFirmware(aux.getBuffer(), currentVersion);
 }
 
 #endif // BOARDS_INC

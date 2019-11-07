@@ -124,7 +124,7 @@ bool writeFile(const char *fname, const char *content) {
   return success;
 }
 
-void updateFirmware(const char *url) {
+void updateFirmware(const char *url, const char *currentVersion) {
 }
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   log(CLASS_X8664, Info, "DeepSleep(%ds)...", (int)periodSecs);
