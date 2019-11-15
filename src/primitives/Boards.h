@@ -16,7 +16,7 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #ifndef FIRMWARE_UPDATE_URL
 // convention for firmware file name: firmware-<version>.<platform>.bin
 // to replace: base + project + version + platform
-#define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/firmwares/%s/firmware-%s.%s.bin"
+#define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/firmwares/%s/%s/content?version=%s"
 #endif // FIRMWARE_UPDATE_URL
 
 
@@ -33,9 +33,9 @@ bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*hea
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
-void updateFirmware(const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
+void updateFirmwareFromMain4ino(const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
   Buffer aux(128);
-  aux.fill(FIRMWARE_UPDATE_URL, project, targetVersion, platform);
+  aux.fill(FIRMWARE_UPDATE_URL, project, platform, targetVersion);
   updateFirmware(aux.getBuffer(), currentVersion);
 }
 
