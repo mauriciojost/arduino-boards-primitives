@@ -226,7 +226,7 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
     case HTTP_UPDATE_FAILED:
       log(CLASS_ESP8266,
           Error,
-          "HTTP_UPDATE_FAILD Error (%d): %s\n",
+          "HTTP_UPDATE_FAILED Error (%d): %s\n",
           ESPhttpUpdate.getLastError(),
           ESPhttpUpdate.getLastErrorString().c_str());
       break;

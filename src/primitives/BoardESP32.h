@@ -211,7 +211,7 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
   t_httpUpdate_return ret = updater.update(httpClient.getStream(), url, currentVersion);
   switch (ret) {
     case HTTP_UPDATE_FAILED:
-      log(CLASS_ESP32, Error, "HTTP_UPDATE_FAILD Error (%d): %s\n", updater.getLastError(), updater.getLastErrorString().c_str());
+      log(CLASS_ESP32, Error, "HTTP_UPDATE_FAILED Error (%d): %s\n", updater.getLastError(), updater.getLastErrorString().c_str());
       break;
     case HTTP_UPDATE_NO_UPDATES:
       log(CLASS_ESP32, Debug, "No updates.");
