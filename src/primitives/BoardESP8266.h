@@ -231,10 +231,13 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
           ESPhttpUpdate.getLastErrorString().c_str());
       break;
     case HTTP_UPDATE_NO_UPDATES:
-      log(CLASS_ESP8266, Debug, "No updates.");
+      log(CLASS_ESP8266, Info, "No updates.");
       break;
     case HTTP_UPDATE_OK:
-      log(CLASS_ESP8266, Debug, "Done!");
+      log(CLASS_ESP8266, Info, "Done!");
+      break;
+    default:
+      log(CLASS_ESP8266, Warn, "Unknown response %d", (int)ret);
       break;
   }
 }
