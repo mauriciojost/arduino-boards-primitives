@@ -49,7 +49,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
-  log(CLASS_ESP8266, Info, "Init wifi '%s' (or '%s')...", ssid, ssidb);
+  log(CLASS_ESP8266, Info, "Init wifi (sic=%s) '%s' (or '%s')...", BOOL(skipIfConnected), ssid, ssidb);
   bool wifiIsOff = (wifi_get_opmode() == NULL_MODE);
   if (wifiIsOff) {
     log(CLASS_ESP8266, Debug, "Wifi off, turning on...");
@@ -100,7 +100,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
     log(CLASS_ESP8266, Debug, "..'%s'(%d left)", ssid, attemptsLeft);
     attemptsLeft--;
     if (status == WL_CONNECTED) {
-      log(CLASS_ESP8266, Debug, "Connected! %s", WiFi.localIP().toString().c_str());
+      log(CLASS_ESP8266, Info, "Connected! %s", WiFi.localIP().toString().c_str());
       return true; // connected
     }
     if (attemptsLeft < 0) {
@@ -250,6 +250,8 @@ void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   t.setFreqEverySecs((int)periodSecs);
   time_t toSleepSecs = t.secsToMatch(MAX_DEEP_SLEEP_PERIOD_SECS);
 
+  log(CLASS_ESP32, Info, "Deepsleep(period=%d, tosleep=%d)", (int)periodSecs, (int)toSleepSecs);
+
   deepSleepNotInterruptableSecs(n, toSleepSecs + DEEP_SLEEP_SUPPLEMENT_SECS);
 }
 
@@ -270,7 +272,7 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
 
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t p = (periodSecs > MAX_DEEP_SLEEP_PERIOD_SECS ? MAX_DEEP_SLEEP_PERIOD_SECS : periodSecs);
-  log(CLASS_ESP8266, Debug, "Deep Sleep(%ds)...", (int)p);
+  log(CLASS_ESP8266, Info, "Deep Sleep(%ds)...", (int)p);
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {
