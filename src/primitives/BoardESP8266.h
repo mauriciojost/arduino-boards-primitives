@@ -250,7 +250,7 @@ void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   t.setFreqEverySecs((int)periodSecs);
   time_t toSleepSecs = t.secsToMatch(MAX_DEEP_SLEEP_PERIOD_SECS);
 
-  log(CLASS_ESP8266, Info, "Deepsleep(period=%d, tosleep=%d)", (int)periodSecs, (int)toSleepSecs);
+  log(CLASS_ESP8266, Info, "Deepsleep(period=%d, tosleep=%d+%d)", (int)periodSecs, (int)toSleepSecs, DEEP_SLEEP_SUPPLEMENT_SECS);
 
   deepSleepNotInterruptableSecs(n, toSleepSecs + DEEP_SLEEP_SUPPLEMENT_SECS);
 }
