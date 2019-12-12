@@ -89,6 +89,27 @@ int httpPost(const char *url, const char *body, ParamStream *response, Table *he
   return httpCode;
 }
 
+// TODO: add https support, which requires fingerprint of server that can be obtained as follows:
+//  openssl s_client -connect dweet.io:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers) {
+  int errorCode;
+  switch(method) {
+    case HttpPost:
+      errorCode = httpPost(url, body, response, headers);
+      break;
+    case HttpGet:
+      errorCode = httpGet(url, response, headers);
+      break;
+    default:
+      log(CLASS_X8664, Error, "Not supported %d HTTP method", (int)method);
+      errorCode = -1;
+
+  }
+  return errorCode;
+}
+
+
+
 
 bool readFile(const char *fname, Buffer *content) {
   bool success = false;

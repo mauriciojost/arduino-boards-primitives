@@ -111,57 +111,50 @@ void stopWifi() {
 
 // TODO: add https support, which requires fingerprint of server that can be obtained as follows:
 //  openssl s_client -connect dweet.io:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin
-int httpGet(const char *url, ParamStream *response, Table *headers) {
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers) {
+  int errorCode;
   httpClient.begin(url);
+  log(CLASS_ESP32, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
+
   int i = 0;
   while ((i = headers->next(i)) != -1) {
     httpClient.addHeader(headers->getKey(i), headers->getValue(i));
     i++;
   }
-  log(CLASS_ESP32, Debug, "> GET:..%s", tailStr(url, URL_PRINT_MAX_LENGTH));
-  int errorCode = httpClient.GET();
-  log(CLASS_ESP32, Debug, "> GET:%d", errorCode);
+  switch(method) {
+    case HttpPost:
+      log(CLASS_ESP32, Debug, "> '%s'", body);
+      errorCode = httpClient.POST(body);
+      if (errorCode == HTTP_OK || errorCode == HTTP_CREATED) {
+        if (response != NULL) {
+          httpClient.writeToStream(response);
+        }
+      } else {
+        int e = httpClient.writeToStream(&Serial);
+        log(CLASS_ESP32, Error, "> POST(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
+      }
+      break;
+    case HttpGet:
+      errorCode = httpClient.GET();
 
-  if (errorCode == HTTP_OK || errorCode == HTTP_NO_CONTENT) {
-    if (response != NULL) {
-      httpClient.writeToStream(response);
-    }
-  } else {
-    int e = httpClient.writeToStream(&Serial);
-    log(CLASS_ESP32, Error, "> GET(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
+      if (errorCode == HTTP_OK || errorCode == HTTP_NO_CONTENT) {
+        if (response != NULL) {
+          httpClient.writeToStream(response);
+        }
+      } else {
+        int e = httpClient.writeToStream(&Serial);
+        log(CLASS_ESP32, Error, "> GET(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
+      }
+      break;
+    default:
+      log(CLASS_ESP32, Error, "Not supported %d HTTP method", (int)method);
+      errorCode = -1;
+
   }
+
+  log(CLASS_ESP32, Debug, "< %d", errorCode);
   httpClient.end();
-
   delay(WAIT_BEFORE_HTTP_MS);
-
-  return errorCode;
-}
-
-int httpPost(const char *url, const char *body, ParamStream *response, Table *headers) {
-  httpClient.begin(url);
-  int i = 0;
-  while ((i = headers->next(i)) != -1) {
-    httpClient.addHeader(headers->getKey(i), headers->getValue(i));
-    i++;
-  }
-
-  log(CLASS_ESP32, Debug, "> POST:..%s", tailStr(url, URL_PRINT_MAX_LENGTH));
-  log(CLASS_ESP32, Debug, "> POST:'%s'", body);
-  int errorCode = httpClient.POST(body);
-  log(CLASS_ESP32, Debug, "> POST:%d", errorCode);
-
-  if (errorCode == HTTP_OK || errorCode == HTTP_CREATED) {
-    if (response != NULL) {
-      httpClient.writeToStream(response);
-    }
-  } else {
-    int e = httpClient.writeToStream(&Serial);
-    log(CLASS_ESP32, Error, "> POST(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
-  }
-  httpClient.end();
-
-  delay(WAIT_BEFORE_HTTP_MS);
-
   return errorCode;
 }
 
