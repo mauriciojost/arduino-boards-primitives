@@ -8,6 +8,9 @@
 #include <main4ino/HttpCodes.h>
 
 enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
+enum HttpMethod { HttpGet = 0, HttpPost, HttpUpdate, HttpDelete};
+
+#define HTTP_METHOD_STR(x) ((x==HttpGet?"GET":(x==HttpPost?"POST":(x==HttpUpdate?"UPDATE":(x==HttpDelete?"DELETE":"UNKNOWN")))))
 
 #ifndef MAIN4INOSERVER_API_HOST_BASE 
 #define MAIN4INOSERVER_API_HOST_BASE "http://martinenhome.com/main4ino/prd"
@@ -23,8 +26,7 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
-int httpGet(const char *url, ParamStream *response, Table *headers);
-int httpPost(const char *url, const char *body, ParamStream *response, Table *headers);
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers);
 bool readFile(const char *fname, Buffer *content);
 bool writeFile(const char *fname, const char *content);
 void updateFirmware(const char *url, const char *currentVersion);
