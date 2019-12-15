@@ -6,11 +6,9 @@
 #include <main4ino/ParamStream.h>
 #include <main4ino/Buffer.h>
 #include <main4ino/HttpCodes.h>
+#include <main4ino/HttpMethods.h>
 
 enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
-enum HttpMethod { HttpGet = 0, HttpPost, HttpUpdate, HttpDelete};
-
-#define HTTP_METHOD_STR(x) ((x==HttpGet?"GET":(x==HttpPost?"POST":(x==HttpUpdate?"UPDATE":(x==HttpDelete?"DELETE":"UNKNOWN")))))
 
 #ifndef MAIN4INOSERVER_API_HOST_BASE 
 #define MAIN4INOSERVER_API_HOST_BASE "http://martinenhome.com/main4ino/prd"
