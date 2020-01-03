@@ -16,6 +16,7 @@
 #define HTTP_CODE_KEY "HTTP_CODE:"
 #define CURL_COMMAND_GET "/usr/bin/curl --silent -w '" HTTP_CODE_KEY "%%{http_code}' -XGET '%s'"
 #define CURL_COMMAND_POST "/usr/bin/curl --silent -w '" HTTP_CODE_KEY "%%{http_code}' -XPOST '%s' -d '%s'"
+#define CURL_COMMAND_PUT "/usr/bin/curl --silent -w '" HTTP_CODE_KEY "%%{http_code}' -XPUT '%s' -d '%s'"
 unsigned long millis();
 
 
@@ -89,13 +90,47 @@ int httpPost(const char *url, const char *body, ParamStream *response, Table *he
   return httpCode;
 }
 
+int httpPut(const char *url, const char *body, ParamStream *response, Table *headers) {
+  Buffer aux(CL_MAX_LENGTH);
+  int httpCode = HTTP_BAD_REQUEST;
+  aux.fill(CURL_COMMAND_PUT, url, body);
+  int i = 0;
+  while ((i = headers->next(i)) != -1) {
+    aux.append(" -H '");
+    aux.append(headers->getKey(i));
+    aux.append(": ");
+    aux.append(headers->getValue(i));
+    aux.append("'");
+    i++;
+  }
+  log(CLASS_X8664, Debug, "PUT: '%s'", aux.getBuffer());
+  FILE *fp = popen(aux.getBuffer(), "r");
+  if (fp == NULL) {
+    log(CLASS_X8664, Warn, "PUT failed");
+    return HTTP_BAD_REQUEST;
+  }
+  while (fgets(aux.getUnsafeBuffer(), CL_MAX_LENGTH - 1, fp) != NULL) {
+    const char *codeStr = aux.since(HTTP_CODE_KEY);
+    httpCode = (codeStr != NULL ? atoi(codeStr + strlen(HTTP_CODE_KEY)) : HTTP_BAD_REQUEST);
+    if (response != NULL) {
+      response->fillUntil(aux.getBuffer(), HTTP_CODE_KEY);
+      log(CLASS_X8664, Debug, "-> %s", response->content());
+    }
+  }
+  pclose(fp);
+  return httpCode;
+}
+
 // TODO: add https support, which requires fingerprint of server that can be obtained as follows:
 //  openssl s_client -connect dweet.io:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin
-int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers) {
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint) {
   int errorCode;
   switch(method) {
     case HttpPost:
       errorCode = httpPost(url, body, response, headers);
+      break;
+    case HttpPut:
+      errorCode = httpPut(url, body, response, headers);
       break;
     case HttpGet:
       errorCode = httpGet(url, response, headers);

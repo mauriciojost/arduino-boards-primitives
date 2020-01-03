@@ -24,7 +24,7 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
-int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers);
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint);
 bool readFile(const char *fname, Buffer *content);
 bool writeFile(const char *fname, const char *content);
 void updateFirmware(const char *url, const char *currentVersion);

@@ -111,9 +111,13 @@ void stopWifi() {
 
 // TODO: add https support, which requires fingerprint of server that can be obtained as follows:
 //  openssl s_client -connect dweet.io:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin
-int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers) {
+int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint) {
   int errorCode;
-  httpClient.begin(url);
+  if (fingerprint == NULL) {
+    httpClient.begin(url);
+  } else {
+    httpClient.begin(url, fingerprint);
+  }
   log(CLASS_ESP32, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
 
   int i = 0;
@@ -123,27 +127,24 @@ int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream
   }
   switch(method) {
     case HttpPost:
-      log(CLASS_ESP32, Debug, "> '%s'", body);
+      log(CLASS_ESP32, Debug, "> POST '%s'", body);
       errorCode = httpClient.POST(body);
-      if (errorCode == HTTP_OK || errorCode == HTTP_CREATED) {
-        if (response != NULL) {
-          httpClient.writeToStream(response);
-        }
-      } else {
-        int e = httpClient.writeToStream(&Serial);
-        log(CLASS_ESP32, Error, "> POST(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
+      if (response != NULL) {
+        httpClient.writeToStream(response);
+      }
+      break;
+    case HttpPut:
+      log(CLASS_ESP32, Debug, "> PUT '%s'", body);
+      errorCode = httpClient.PUT(body);
+      if (response != NULL) {
+        httpClient.writeToStream(response);
       }
       break;
     case HttpGet:
+      log(CLASS_ESP32, Debug, "> GET");
       errorCode = httpClient.GET();
-
-      if (errorCode == HTTP_OK || errorCode == HTTP_NO_CONTENT) {
-        if (response != NULL) {
-          httpClient.writeToStream(response);
-        }
-      } else {
-        int e = httpClient.writeToStream(&Serial);
-        log(CLASS_ESP32, Error, "> GET(%d):%d %s", e, errorCode, httpClient.errorToString(errorCode).c_str());
+      if (response != NULL) {
+        httpClient.writeToStream(response);
       }
       break;
     default:
