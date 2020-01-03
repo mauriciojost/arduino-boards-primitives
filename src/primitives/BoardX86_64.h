@@ -129,7 +129,7 @@ int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream
     case HttpPost:
       errorCode = httpPost(url, body, response, headers);
       break;
-    case HttpPut:
+    case HttpUpdate:
       errorCode = httpPut(url, body, response, headers);
       break;
     case HttpGet:

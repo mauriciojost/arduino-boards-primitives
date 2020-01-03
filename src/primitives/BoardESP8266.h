@@ -142,7 +142,7 @@ int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream
         httpClient.writeToStream(response);
       }
       break;
-    case HttpPut:
+    case HttpUpdate:
       log(CLASS_ESP8266, Debug, "> PUTT '%s'", body);
       errorCode = httpClient.PUT(body);
       if (response != NULL) {
