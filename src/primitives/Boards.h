@@ -14,11 +14,9 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define MAIN4INOSERVER_API_HOST_BASE "http://martinenhome.com/main4ino/prd"
 #endif // MAIN4INOSERVER_API_HOST_BASE 
 
-#ifndef FIRMWARE_UPDATE_URL
 // convention for firmware file name: firmware-<version>.<platform>.bin
 // to replace: base + project + version + platform
-#define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/api/v1/token/%s/devices/%s/firmware/firmwares/%s/%s/content?version=%s"
-#endif // FIRMWARE_UPDATE_URL
+#define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/api/v1/session/%s/devices/%s/firmware/firmwares/%s/%s/content?version=%s"
 
 
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
@@ -33,9 +31,9 @@ bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*hea
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
-void updateFirmwareFromMain4ino(const char* token, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
+void updateFirmwareFromMain4ino(const char* session, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
   Buffer aux(128);
-  aux.fill(FIRMWARE_UPDATE_URL, token, device, project, platform, targetVersion);
+  aux.fill(FIRMWARE_UPDATE_URL, session, device, project, platform, targetVersion);
   updateFirmware(aux.getBuffer(), currentVersion);
 }
 
