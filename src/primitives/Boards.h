@@ -32,7 +32,7 @@ void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
 void updateFirmwareFromMain4ino(const char* session, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
-  Buffer aux(128);
+  Buffer aux(256);
   aux.fill(FIRMWARE_UPDATE_URL, session, device, project, platform, targetVersion);
   updateFirmware(aux.getBuffer(), currentVersion);
 }
