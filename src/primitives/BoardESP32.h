@@ -50,7 +50,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
-  log(CLASS_ESP32, Info, "Init wifi (sic=%s) '%s' (or '%s')...", BOOL(skipIfConnected), ssid, ssidb);
+  log(CLASS_ESP32, Debug, "Init wifi (sic=%s) '%s' (or '%s')...", BOOL(skipIfConnected), ssid, ssidb);
 
   if (skipIfConnected) { // check if connected
     log(CLASS_ESP32, Debug, "Already connected?");
@@ -91,7 +91,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
     log(CLASS_ESP32, Debug, "..'%s'(%d left)", ssid, attemptsLeft);
     attemptsLeft--;
     if (status == WL_CONNECTED) {
-      log(CLASS_ESP32, Info, "Connected! %s", WiFi.localIP().toString().c_str());
+      log(CLASS_ESP32, Debug, "Connected! %s", WiFi.localIP().toString().c_str());
       return true; // connected
     }
     if (attemptsLeft < 0) {
@@ -102,7 +102,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
 }
 
 void stopWifi() {
-  log(CLASS_ESP32, Info, "W.Off.");
+  log(CLASS_ESP32, Debug, "W.Off.");
   WiFi.disconnect();
   delay(WIFI_DELAY_MS);
   WiFi.mode(WIFI_OFF); // to be removed after SDK update to 1.5.4
@@ -191,7 +191,7 @@ bool writeFile(const char *fname, const char *content) {
   } else {
     f.print(content);
     f.close();
-    log(CLASS_ESP32, Info, "File written: %s", fname);
+    log(CLASS_ESP32, Debug, "File written: %s", fname);
     success = true;
   }
   return success;
