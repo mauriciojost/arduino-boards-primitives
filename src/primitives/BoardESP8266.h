@@ -15,10 +15,6 @@
 
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
 
-#ifndef DEEP_SLEEP_SUPPLEMENT_SECS
-#define DEEP_SLEEP_SUPPLEMENT_SECS 60
-#endif // DEEP_SLEEP_SUPPLEMENT_SECS
-
 #ifndef WIFI_DELAY_MS
 #define WIFI_DELAY_MS 2000
 #endif // WIFI_DELAY_MS
@@ -236,17 +232,8 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
   }
 }
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
-  Timing t = Timing();
-  time_t n = now();
-
-  // calculate time to boot regularly at the same moments
-  t.setCurrentTime(n);
-  t.setFreqEverySecs((int)periodSecs);
-  time_t toSleepSecs = t.secsToMatch(MAX_DEEP_SLEEP_PERIOD_SECS);
-
-  log(CLASS_ESP8266, Info, "Deepsleep(period=%d, tosleep=%d+%d)", (int)periodSecs, (int)toSleepSecs, DEEP_SLEEP_SUPPLEMENT_SECS);
-
-  deepSleepNotInterruptableSecs(n, toSleepSecs + DEEP_SLEEP_SUPPLEMENT_SECS);
+  log(CLASS_ESP8266, Info, "DS(period=%d)", (int)periodSecs);
+  deepSleepNotInterruptableSecs(now(), periodSecs);
 }
 
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
