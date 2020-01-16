@@ -220,7 +220,8 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
 }
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   log(CLASS_ESP32, Info, "DS(period=%d)", (int)periodSecs);
-  deepSleepNotInterruptableSecs(now(), periodSecs);
+  deepSleepNotInterruptableSecs(cycleBegin, periodSecs);
+  lightSleepNotInterruptable(cycleBegin, periodSecs, NULL); // the above statement is async, wait until effective
 }
 
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
