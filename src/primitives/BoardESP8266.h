@@ -234,11 +234,11 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
   log(CLASS_ESP8266, Info, "DS(period=%d)", (int)periodSecs);
   deepSleepNotInterruptableSecs(cycleBegin, periodSecs);
-  lightSleepNotInterruptable(cycleBegin, periodSecs, NULL); // the above statement is async, wait until effective
+  delay(5000); // the above statement is async, wait until effective
 }
 
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
-  log(CLASS_ESP8266, Debug, "Light Sleep(%ds)...", (int)periodSecs);
+  log(CLASS_ESP8266, Debug, "LS(%ds)...", (int)periodSecs);
   if (interrupt()) { // first quick check before any time considerations
     return true;
   }
@@ -253,8 +253,8 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
 }
 
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
-  time_t p = (periodSecs > MAX_DEEP_SLEEP_PERIOD_SECS ? MAX_DEEP_SLEEP_PERIOD_SECS : periodSecs);
-  log(CLASS_ESP8266, Info, "Deep Sleep(%ds)...", (int)p);
+  time_t p = CONSTRAIN_VALUE(periodSecs, 0, MAX_DEEP_SLEEP_PERIOD_SECS);
+  log(CLASS_ESP8266, Info, "DS(%ds)...", (int)p);
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {
@@ -264,7 +264,7 @@ void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
 }
 
 bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)()) {
-  log(CLASS_ESP8266, Debug, "Light Sleep(%ds)...", (int)periodSecs);
+  log(CLASS_ESP8266, Debug, "LS(%ds)...", (int)periodSecs);
   while (now() < cycleBegin + periodSecs) {
     if (heartbeat) heartbeat();
     delay(1000);
