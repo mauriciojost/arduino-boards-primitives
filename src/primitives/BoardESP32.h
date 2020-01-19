@@ -241,7 +241,7 @@ void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {
-    ESP.deepSleep(leftSecs * 1000000L);
+    ESP.deepSleep(leftSecs * FACTOR_USEC_TO_SEC_DEEP_SLEEP);
   }
 }
 

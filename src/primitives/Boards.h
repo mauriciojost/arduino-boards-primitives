@@ -18,6 +18,9 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 // to replace: base + project + version + platform
 #define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/api/v1/session/%s/devices/%s/firmware/firmwares/%s/%s/content?version=%s"
 
+#ifndef FACTOR_USEC_TO_SEC_DEEP_SLEEP
+#define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
+#endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
 
 WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);

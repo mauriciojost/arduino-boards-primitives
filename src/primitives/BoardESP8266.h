@@ -258,8 +258,7 @@ void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t spentSecs = now() - cycleBegin;
   time_t leftSecs = p - spentSecs;
   if (leftSecs > 0) {
-    // lcd->command(PCD8544_FUNCTIONSET | PCD8544_POWERDOWN);
-    ESP.deepSleep(leftSecs * 1000000L, WAKE_RF_DEFAULT);
+    ESP.deepSleep(leftSecs * FACTOR_USEC_TO_SEC_DEEP_SLEEP, WAKE_RF_DEFAULT);
   }
 }
 
