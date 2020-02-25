@@ -33,14 +33,12 @@ int httpGet(const char *url, ParamStream *response, Table *headers) {
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_GET, url);
-  int i = 0;
-  while ((i = headers->next(i)) != -1) {
+  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
     aux.append(" -H '");
-    aux.append(headers->getKey(i));
+    aux.append(kv.getKey());
     aux.append(": ");
-    aux.append(headers->getValue(i));
+    aux.append(kv.getValue());
     aux.append("'");
-    i++;
   }
   log(CLASS_X8664, Debug, "GET: '%s'", aux.getBuffer());
   FILE *fp = popen(aux.getBuffer(), "r");
@@ -63,14 +61,12 @@ int httpPost(const char *url, const char *body, ParamStream *response, Table *he
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_POST, url, body);
-  int i = 0;
-  while ((i = headers->next(i)) != -1) {
+  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
     aux.append(" -H '");
-    aux.append(headers->getKey(i));
+    aux.append(kv.getKey());
     aux.append(": ");
-    aux.append(headers->getValue(i));
+    aux.append(kv.getValue());
     aux.append("'");
-    i++;
   }
   log(CLASS_X8664, Debug, "POST: '%s'", aux.getBuffer());
   FILE *fp = popen(aux.getBuffer(), "r");
@@ -94,14 +90,12 @@ int httpPut(const char *url, const char *body, ParamStream *response, Table *hea
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_PUT, url, body);
-  int i = 0;
-  while ((i = headers->next(i)) != -1) {
+  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
     aux.append(" -H '");
-    aux.append(headers->getKey(i));
+    aux.append(kv.getKey());
     aux.append(": ");
-    aux.append(headers->getValue(i));
+    aux.append(kv.getValue());
     aux.append("'");
-    i++;
   }
   log(CLASS_X8664, Debug, "PUT: '%s'", aux.getBuffer());
   FILE *fp = popen(aux.getBuffer(), "r");

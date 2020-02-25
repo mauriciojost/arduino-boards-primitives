@@ -115,11 +115,8 @@ int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream
     httpClient.begin(url, fingerprint);
   }
   log(CLASS_ESP32, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
-
-  int i = 0;
-  while ((i = headers->next(i)) != -1) {
-    httpClient.addHeader(headers->getKey(i), headers->getValue(i));
-    i++;
+  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
+    httpClient.addHeader(kv.getKey(), kv.getValue());
   }
   switch(method) {
     case HttpPost:
