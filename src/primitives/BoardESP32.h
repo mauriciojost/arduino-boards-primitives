@@ -11,7 +11,8 @@
 #include <SPIFFS.h>
 //#include <EspSaveCrash.h> // not found for esp32 yet
 #include <FS.h>
-#include "Boards.h"
+#include <Boards.h>
+#include <BoardESP.h>
 
 
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
@@ -27,21 +28,6 @@
 #define WAIT_BEFORE_HTTP_MS 100
 
 HTTPClient httpClient;
-
-WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
-  int n = WiFi.scanNetworks();
-  for (int i = 0; i < n; ++i) {
-    String s = WiFi.SSID(i);
-    if (strcmp(s.c_str(), ssid) == 0) {
-      log(CLASS_ESP32, Info, "Wifi found '%s'", ssid);
-      return WifiMainNetwork;
-    } else if (strcmp(s.c_str(), ssidb) == 0) {
-      log(CLASS_ESP32, Info, "Wifi found '%s'", ssidb);
-      return WifiBackupNetwork;
-    }
-  }
-  return WifiNoNetwork;
-}
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;

@@ -26,7 +26,6 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
 #endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
 
-WifiNetwork detectWifi(const char *ssid, const char *ssidb);
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
 int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint);
