@@ -11,8 +11,8 @@
 #include <ESP8266httpUpdate.h>
 #include <EspSaveCrash.h>
 #include <FS.h>
-#include <Boards.h>
-#include <BoardESP.h>
+#include <primitives/Boards.h>
+#include <primitives/BoardESP.h>
 
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
 
