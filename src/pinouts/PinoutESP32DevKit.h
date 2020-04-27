@@ -3,7 +3,7 @@
 // FROM https://circuits4you.com/2018/12/31/esp32-devkit-esp32-wroom-gpio-pinout/
 
 #define GPIO1_PIN 1 // CLOCK3 / U0_TXD
-#define GPIO2_PIN 2 // CS / ADC2_2 / HSPI-WP / TOUCH2
+#define GPIO2_PIN 2 // CS / ADC2_2 / HSPI-WP / TOUCH2 / BUILTIN RED LED
 #define GPIO3_PIN 3 // CLK2 / U0_RXD
 #define GPIO4_PIN 4 // ADC2_0 / HSPI_HD / TOUCH0
 #define GPIO5_PIN 5 // V_SPI_CS0
