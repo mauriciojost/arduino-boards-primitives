@@ -19,7 +19,6 @@
 #define CURL_COMMAND_PUT "/usr/bin/curl --silent -w '" HTTP_CODE_KEY "%%{http_code}' -XPUT '%s' -d '%s'"
 unsigned long millis();
 
-
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   log(CLASS_X8664, Debug, "initWifi(%s, %s, %d)", ssid, pass, retries);
   return true;
@@ -29,7 +28,7 @@ void stopWifi() {
   log(CLASS_X8664, Debug, "stopWifi()");
 }
 
-int httpGet(const char *url, ParamStream *response, Table *headers) {
+int httpGet(const char *url, Stream *response, Table *headers) {
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_GET, url);
@@ -57,7 +56,7 @@ int httpGet(const char *url, ParamStream *response, Table *headers) {
   return httpCode;
 }
 
-int httpPost(const char *url, const char *body, ParamStream *response, Table *headers) {
+int httpPost(const char *url, const char *body, Stream *response, Table *headers) {
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_POST, url, body);
@@ -86,7 +85,7 @@ int httpPost(const char *url, const char *body, ParamStream *response, Table *he
   return httpCode;
 }
 
-int httpPut(const char *url, const char *body, ParamStream *response, Table *headers) {
+int httpPut(const char *url, const char *body, Stream *response, Table *headers) {
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
   aux.fill(CURL_COMMAND_PUT, url, body);
@@ -115,9 +114,7 @@ int httpPut(const char *url, const char *body, ParamStream *response, Table *hea
   return httpCode;
 }
 
-// TODO: add https support, which requires fingerprint of server that can be obtained as follows:
-//  openssl s_client -connect dweet.io:443 < /dev/null 2>/dev/null | openssl x509 -fingerprint -noout -in /dev/stdin
-int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint) {
+int httpMethod(HttpMethod method, const char *url, const char *body, Stream *response, Table *headers, const char *fingerprint) {
   int errorCode;
   switch(method) {
     case HttpPost:
@@ -137,8 +134,25 @@ int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream
   return errorCode;
 }
 
+int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *response, Table *headers, const char *fingerprint) {
+  int errorCode;
+  switch(method) {
+    case HttpPost:
+      errorCode = httpPost(url, body->content(), response, headers);
+      break;
+    case HttpUpdate:
+      errorCode = httpPut(url, body->content(), response, headers);
+      break;
+    case HttpGet:
+      errorCode = httpGet(url, response, headers);
+      break;
+    default:
+      log(CLASS_X8664, Error, "Not supported %d HTTP method", (int)method);
+      errorCode = -1;
 
-
+  }
+  return errorCode;
+}
 
 bool readFile(const char *fname, Buffer *content) {
   bool success = false;
