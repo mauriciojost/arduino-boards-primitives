@@ -91,7 +91,7 @@ void stopWifi() {
   delay(WIFI_DELAY_MS);
 }
 
-int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *response, Table *headers, const char *fingerprint) {
+HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table *headers, const char *fingerprint) {
   int errorCode;
   if (fingerprint == NULL) {
     httpClient.begin(url);
