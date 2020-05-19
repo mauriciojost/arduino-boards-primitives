@@ -91,51 +91,6 @@ void stopWifi() {
   delay(WIFI_DELAY_MS);
 }
 
-int httpMethod(HttpMethod method, const char *url, const char *body, ParamStream *response, Table *headers, const char *fingerprint) {
-  int errorCode;
-  if (fingerprint == NULL) {
-    httpClient.begin(url);
-  } else {
-    httpClient.begin(url, fingerprint);
-  }
-  log(CLASS_ESP32, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
-  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
-    httpClient.addHeader(kv.getKey(), kv.getValue());
-  }
-  switch(method) {
-    case HttpPost:
-      log(CLASS_ESP32, Debug, "> POST '%s'", body);
-      errorCode = httpClient.POST(body);
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
-      break;
-    case HttpUpdate:
-      log(CLASS_ESP32, Debug, "> PUT '%s'", body);
-      errorCode = httpClient.PUT(body);
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
-      break;
-    case HttpGet:
-      log(CLASS_ESP32, Debug, "> GET");
-      errorCode = httpClient.GET();
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
-      break;
-    default:
-      log(CLASS_ESP32, Error, "Not supported %d HTTP method", (int)method);
-      errorCode = -1;
-
-  }
-
-  log(CLASS_ESP32, Debug, "< %d", errorCode);
-  httpClient.end();
-  delay(WAIT_BEFORE_HTTP_MS);
-  return errorCode;
-}
-
 int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *response, Table *headers, const char *fingerprint) {
   int errorCode;
   if (fingerprint == NULL) {
@@ -151,23 +106,14 @@ int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *respons
     case HttpPost:
       log(CLASS_ESP32, Debug, "> POST");
       errorCode = httpClient.sendRequest("POST", body, 0);
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
       break;
     case HttpUpdate:
       log(CLASS_ESP32, Debug, "> PUT");
       errorCode = httpClient.sendRequest("PUT", body, 0);
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
       break;
     case HttpGet:
       log(CLASS_ESP32, Debug, "> GET");
       errorCode = httpClient.sendRequest("GET");
-      if (response != NULL) {
-        httpClient.writeToStream(response);
-      }
       break;
     default:
       log(CLASS_ESP32, Error, "Not supported %d HTTP method", (int)method);
@@ -176,9 +122,9 @@ int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *respons
   }
 
   log(CLASS_ESP32, Debug, "< %d", errorCode);
-  httpClient.end();
+  httpClient.end(); // SUCCEPTIBLE TO CHANGE
   delay(WAIT_BEFORE_HTTP_MS);
-  return errorCode;
+  return HttpResponse(errorCode, httpClient.getResponsePtr());
 }
 
 bool readFile(const char *fname, Buffer *content) {
