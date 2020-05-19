@@ -7,6 +7,7 @@
 #include <main4ino/Buffer.h>
 #include <main4ino/HttpCodes.h>
 #include <main4ino/HttpMethods.h>
+#include <main4ino/HttpResponse.h>
 #include <Stream.h>
 
 enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
