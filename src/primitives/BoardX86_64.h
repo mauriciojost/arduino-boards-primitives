@@ -37,7 +37,7 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
   switch (m) {
     case (HttpPost): 
       Buffer b(1024);
-      body.readBytes(b.getUnsafeBuffer(), g.getCapacity());
+      body->readBytes(b.getUnsafeBuffer(), g.getCapacity());
       aux.fill(CURL_COMMAND_POST, url, b.getBuffer());
       log(CLASS_X8664, Debug, "POST: '%s'", aux.getBuffer());
       break;
@@ -47,7 +47,7 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
       break;
     case (HttpUpdate): 
       Buffer b(1024);
-      body.readBytes(b.getUnsafeBuffer(), g.getCapacity());
+      body->readBytes(b.getUnsafeBuffer(), g.getCapacity());
       aux.fill(CURL_COMMAND_PUT, url, b.getBuffer());
       log(CLASS_X8664, Debug, "PUT: '%s'", aux.getBuffer());
       break;
