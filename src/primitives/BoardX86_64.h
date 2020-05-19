@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <main4ino/HttpResponse.h>
+#include <main4ino/Buffer.h>
 
 #include <primitives/Boards.h>
 
@@ -34,11 +35,11 @@ void stopWifi() {
 HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *headers, const char* fingerprints /* ignored */) {
   Buffer aux(CL_MAX_LENGTH);
   int httpCode = HTTP_BAD_REQUEST;
+  Buffer b(1024);
   switch (m) {
     case (HttpPost): 
-      Buffer b1(1024);
-      body->readBytes(b1.getUnsafeBuffer(), b1.getCapacity());
-      aux.fill(CURL_COMMAND_POST, url, b1.getBuffer());
+      body->readBytes(b.getUnsafeBuffer(), b.getCapacity());
+      aux.fill(CURL_COMMAND_POST, url, b.getBuffer());
       log(CLASS_X8664, Debug, "POST: '%s'", aux.getBuffer());
       break;
     case (HttpGet): 
@@ -46,9 +47,8 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
       log(CLASS_X8664, Debug, "GET: '%s'", aux.getBuffer());
       break;
     case (HttpUpdate): 
-      Buffer b2(1024);
-      body->readBytes(b2.getUnsafeBuffer(), b2.getCapacity());
-      aux.fill(CURL_COMMAND_PUT, url, b2.getBuffer());
+      body->readBytes(b.getUnsafeBuffer(), b.getCapacity());
+      aux.fill(CURL_COMMAND_PUT, url, b.getBuffer());
       log(CLASS_X8664, Debug, "PUT: '%s'", aux.getBuffer());
       break;
     default:
