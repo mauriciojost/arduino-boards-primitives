@@ -124,7 +124,7 @@ int httpMethod(HttpMethod method, const char *url, Stream *body, Stream *respons
   log(CLASS_ESP32, Debug, "< %d", errorCode);
   httpClient.end(); // SUCCEPTIBLE TO CHANGE
   delay(WAIT_BEFORE_HTTP_MS);
-  return HttpResponse(errorCode, httpClient.getResponsePtr());
+  return HttpResponse(errorCode, httpClient.getStreamPtr());
 }
 
 bool readFile(const char *fname, Buffer *content) {

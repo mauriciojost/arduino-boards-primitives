@@ -134,7 +134,7 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
   log(CLASS_ESP8266, Debug, "< %d", errorCode);
   httpClient.end(); // MMM SUCCEPTIBLE TO CHANGE
   delay(WAIT_BEFORE_HTTP_MS);
-  return HttpResponse(errorCode, httpClient.getResponsePtr());
+  return HttpResponse(errorCode, httpClient.getStreamPtr());
 }
 
 bool readFile(const char *fname, Buffer *content) {
