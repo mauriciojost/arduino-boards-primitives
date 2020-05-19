@@ -36,7 +36,9 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
   int httpCode = HTTP_BAD_REQUEST;
   switch (m) {
     case (HttpPost): 
-      aux.fill(CURL_COMMAND_POST, url, body);
+      Buffer b(1024);
+      body.readBytes(b.getUnsafeBuffer(), g.getCapacity());
+      aux.fill(CURL_COMMAND_POST, url, b.getBuffer());
       log(CLASS_X8664, Debug, "POST: '%s'", aux.getBuffer());
       break;
     case (HttpGet): 
@@ -44,7 +46,9 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
       log(CLASS_X8664, Debug, "GET: '%s'", aux.getBuffer());
       break;
     case (HttpUpdate): 
-      aux.fill(CURL_COMMAND_PUT, url, body);
+      Buffer b(1024);
+      body.readBytes(b.getUnsafeBuffer(), g.getCapacity());
+      aux.fill(CURL_COMMAND_PUT, url, b.getBuffer());
       log(CLASS_X8664, Debug, "PUT: '%s'", aux.getBuffer());
       break;
     default:
