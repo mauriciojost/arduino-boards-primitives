@@ -22,6 +22,7 @@
 unsigned long millis();
 
 ParamStream* response = new ParamStream(1024);
+std::function<void ()> nop = []() {};
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   log(CLASS_X8664, Debug, "initWifi(%s, %s, %d)", ssid, pass, retries);
@@ -64,7 +65,7 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
   FILE *fp = popen(aux.getBuffer(), "r");
   if (fp == NULL) {
     log(CLASS_X8664, Warn, "HTTP method failed");
-    return HttpResponse(HTTP_BAD_REQUEST, response);
+    return HttpResponse(HTTP_BAD_REQUEST, response, nop);
   }
   while (fgets(aux.getUnsafeBuffer(), CL_MAX_LENGTH - 1, fp) != NULL) {
     const char *codeStr = aux.since(HTTP_CODE_KEY);
@@ -75,7 +76,7 @@ HttpResponse httpMethod(HttpMethod m, const char *url, Stream* body, Table *head
     }
   }
   pclose(fp);
-  return HttpResponse(httpCode, response);
+  return HttpResponse(httpCode, response, nop);
 }
 
 bool readFile(const char *fname, Buffer *content) {

@@ -28,6 +28,7 @@
 #define WAIT_BEFORE_HTTP_MS 100
 
 HTTPClient httpClient;
+std::function<void ()> httpClientEnd = []() { httpClient.end();};
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
@@ -122,9 +123,8 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
   }
 
   log(CLASS_ESP32, Debug, "< %d", errorCode);
-  httpClient.end(); // SUCCEPTIBLE TO CHANGE
   delay(WAIT_BEFORE_HTTP_MS);
-  return HttpResponse(errorCode, httpClient.getStreamPtr());
+  return HttpResponse(errorCode, httpClient.getStreamPtr(), httpClientEnd);
 }
 
 bool readFile(const char *fname, Buffer *content) {
