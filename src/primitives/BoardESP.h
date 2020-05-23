@@ -5,6 +5,9 @@
 #define NRO_ATTEMPTS 5
 #define WAIT_BEFORE_HTTP_MS 100
 
+#ifndef URL_PRINT_MAX_LENGTH
+#define URL_PRINT_MAX_LENGTH 20
+#endif // URL_PRINT_MAX_LENGTH
 
 CustomHTTPClient httpClient;
 std::function<void ()> httpClientEnd = []() { httpClient.end();};

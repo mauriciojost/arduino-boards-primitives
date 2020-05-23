@@ -22,10 +22,6 @@
 #define WIFI_DELAY_MS 2000
 #endif // WIFI_DELAY_MS
 
-#ifndef URL_PRINT_MAX_LENGTH
-#define URL_PRINT_MAX_LENGTH 20
-#endif // URL_PRINT_MAX_LENGTH
-
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
