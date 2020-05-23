@@ -12,6 +12,7 @@
 //#include <EspSaveCrash.h> // not found for esp32 yet
 #include <FS.h>
 #include <primitives/Boards.h>
+#include <primitives/CustomHTTPClient.h>
 #include <primitives/BoardESP.h>
 
 
@@ -24,11 +25,6 @@
 #ifndef URL_PRINT_MAX_LENGTH
 #define URL_PRINT_MAX_LENGTH 20
 #endif // URL_PRINT_MAX_LENGTH
-
-#define WAIT_BEFORE_HTTP_MS 100
-
-HTTPClient httpClient;
-std::function<void ()> httpClientEnd = []() { httpClient.end();};
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
@@ -90,41 +86,6 @@ void stopWifi() {
   delay(WIFI_DELAY_MS);
   WiFi.mode(WIFI_OFF); // to be removed after SDK update to 1.5.4
   delay(WIFI_DELAY_MS);
-}
-
-HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table *headers, const char *fingerprint) {
-  int errorCode;
-  if (fingerprint == NULL) {
-    httpClient.begin(url);
-  } else {
-    httpClient.begin(url, fingerprint);
-  }
-  log(CLASS_ESPX, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
-  for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
-    httpClient.addHeader(kv.getKey(), kv.getValue());
-  }
-  switch(method) {
-    case HttpPost:
-      log(CLASS_ESPX, Debug, "> POST");
-      errorCode = httpClient.sendRequest("POST", body, body->available());
-      break;
-    case HttpUpdate:
-      log(CLASS_ESPX, Debug, "> PUT");
-      errorCode = httpClient.sendRequest("PUT", body, body->available());
-      break;
-    case HttpGet:
-      log(CLASS_ESPX, Debug, "> GET");
-      errorCode = httpClient.sendRequest("GET");
-      break;
-    default:
-      log(CLASS_ESPX, Error, "Not supported %d HTTP method", (int)method);
-      errorCode = -1;
-
-  }
-
-  log(CLASS_ESPX, Debug, "< %d", errorCode);
-  delay(WAIT_BEFORE_HTTP_MS);
-  return HttpResponse(errorCode, httpClient.getStreamPtr(), httpClientEnd);
 }
 
 bool readFile(const char *fname, Buffer *content) {
