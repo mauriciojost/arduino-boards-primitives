@@ -40,6 +40,7 @@ public:
         int sizeAvailable = stream->available();
 
         if(sizeAvailable) { // size cannot be -1: if != 0 then read bytes, otherwise wait until new data arrives
+          log(CLASS_CUSTOM_HTTP, Debug, "Avlble: '%d'", sizeAvailable);
 
           int readBytes = sizeAvailable;
 
@@ -51,13 +52,16 @@ public:
           // read data
           int payloadBytesRead = stream->readBytes(payloadChunk, readBytes);
 
-          // write it to Stream (length)
+          // write to Stream the length
           int l = sprintf((char*)lenHex, "%X\r\n", payloadBytesRead);
+          // FIXME l could be negative
           int bytesWriteL = _client->write((const uint8_t *) lenHex, l);
-          // write it to Stream (partial body)
-          int payloadBytesWrite = _client->write((const uint8_t *) payloadChunk, payloadBytesRead);
 
-          _client->write((const uint8_t *) "\n\r\n", 3);
+          // write to Stream the chunked body
+          int payloadBytesWrite = _client->write((const uint8_t *) payloadChunk, payloadBytesRead);
+          _client->write((const uint8_t *) "\r\n", 2);
+
+          log(CLASS_CUSTOM_HTTP, Debug, "Write: lhex='%s' cont='%s'", lenHex, payloadChunk);
 
           // are all Bytes a writen to stream ?
           if(payloadBytesWrite != payloadBytesRead) {
