@@ -10,11 +10,13 @@ public:
   int sendRequestChunked(const char * type, Stream * stream) {
 
     if(!stream) {
+      clear();
       return returnError(HTTPC_ERROR_NO_STREAM);
     }
 
     // connect to server
     if(!connect()) {
+      clear();
       return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
     }
 
@@ -23,6 +25,7 @@ public:
 
     // send Header
     if(!sendHeader(type)) {
+      clear();
       return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
     }
 
@@ -33,6 +36,7 @@ public:
     uint8_t * lenHex = (uint8_t *) malloc(8 + 1);
 
     if(payloadChunk) {
+      memset(payloadChunk, 0, buff_size);
       // read all data from stream and send it to server
       while(connected() && (stream->available() > -1)) {
 
@@ -73,6 +77,7 @@ public:
             log(CLASS_CUSTOM_HTTP, Warn, "Write error %d", _client->getWriteError());
             free(payloadChunk);
             free(lenHex);
+            clear();
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
           }
 
@@ -89,10 +94,12 @@ public:
 
     } else {
       log(CLASS_CUSTOM_HTTP, Warn, "Not enough RAM / %d", HTTP_TCP_BUFFER_SIZE);
+      clear();
       return returnError(HTTPC_ERROR_TOO_LESS_RAM);
     }
 
     // handle Server Response (Header)
+    clear();
     return returnError(handleHeaderResponse());
   }
 
