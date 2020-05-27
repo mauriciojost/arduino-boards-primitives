@@ -36,9 +36,10 @@ public:
     uint8_t * lenHex = (uint8_t *) malloc(8 + 1);
 
     if(payloadChunk) {
-      memset(payloadChunk, 0, buff_size);
       // read all data from stream and send it to server
       while(connected() && (stream->available() > -1)) {
+
+        memset(payloadChunk, 0, buff_size);
 
         // get available data size
         int sizeAvailable = stream->available();
