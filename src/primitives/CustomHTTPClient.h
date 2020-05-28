@@ -58,15 +58,16 @@ public:
           int payloadBytesRead = stream->readBytes(payloadChunk, readBytes);
 
           // write to Stream the length
-          int l = sprintf((char*)lenHex, "%X\r\n", payloadBytesRead);
+          int l = sprintf((char*)lenHex, "%X", payloadBytesRead);
           // FIXME l could be negative
-          int bytesWriteL = _client->write((const uint8_t *) lenHex, l);
+          _client->write((const uint8_t *) lenHex, l);
+          _client->write((const uint8_t *) "\r\n", 2);
 
           // write to Stream the chunked body
           int payloadBytesWrite = _client->write((const uint8_t *) payloadChunk, payloadBytesRead);
           _client->write((const uint8_t *) "\r\n", 2);
 
-          log(CLASS_CUSTOM_HTTP, Debug, "Write: lhex='%s' cont='%s'", lenHex, payloadChunk);
+          log(CLASS_CUSTOM_HTTP, Fine, "Write: lhex='%s' cont='%s'", lenHex, payloadChunk);
 
           // are all Bytes a writen to stream ?
           if(payloadBytesWrite != payloadBytesRead) {
