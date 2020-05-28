@@ -145,9 +145,10 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
     case HTTP_UPDATE_FAILED:
       log(CLASS_ESPX,
           Error,
-          "HTTP_UPDATE_FAILED Error (%d): %s\n",
-          ESPhttpUpdate.getLastError(),
-          ESPhttpUpdate.getLastErrorString().c_str());
+          "UPGR %d/%d/'%s'\n",
+          ret,
+          updater.getLastError(),
+          updater.getLastErrorString().c_str());
       break;
     case HTTP_UPDATE_NO_UPDATES:
       log(CLASS_ESPX, Info, "No updates.");
