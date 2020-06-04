@@ -131,7 +131,7 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
   switch (ret) {
     case HTTP_UPDATE_FAILED:
       log(CLASS_ESPX,
-          Error,
+          Warn,
           "UPGR %d/%d/'%s'\n",
           ret,
           updater.getLastError(),
