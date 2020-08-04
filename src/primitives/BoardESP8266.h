@@ -25,16 +25,16 @@
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
-  log(CLASS_ESPX, Debug, "Init wifi (sic=%s) '%s' (or '%s')...", BOOL(skipIfConnected), ssid, ssidb);
+  log(CLASS_ESPX, Debug, "WifiIn(%s) '%s'/'%s'", BOOL(skipIfConnected), ssid, ssidb);
   bool wifiIsOff = (wifi_get_opmode() == NULL_MODE);
   if (wifiIsOff) {
-    log(CLASS_ESPX, Debug, "Wifi off, turning on...");
+    log(CLASS_ESPX, Debug, "Turning on...");
     wifi_fpm_do_wakeup();
     wifi_fpm_close();
     wifi_set_opmode(STATION_MODE);
     wifi_station_connect();
   } else {
-    log(CLASS_ESPX, Debug, "Wifi on already");
+    log(CLASS_ESPX, Debug, "On already");
   }
 
   if (skipIfConnected) { // check if connected
@@ -51,14 +51,15 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
   log(CLASS_ESPX, Debug, "Scanning...");
   WifiNetwork w = detectWifi(ssid, ssidb);
 
-  log(CLASS_ESPX, Debug, "Connecting...");
   WiFi.mode(WIFI_STA);
   delay(WIFI_DELAY_MS);
   switch (w) {
     case WifiMainNetwork:
+      log(CLASS_ESPX, Debug, "%s => Connecting...", ssid);
       WiFi.begin(ssid, pass);
       break;
     case WifiBackupNetwork:
+      log(CLASS_ESPX, Debug, "%s => Connecting...", ssidb);
       WiFi.begin(ssidb, passb);
       break;
     default:
@@ -73,14 +74,14 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
       return false; // not connected
     }
     status = WiFi.status();
-    log(CLASS_ESPX, Debug, "..'%s'(%d left)", ssid, attemptsLeft);
+    log(CLASS_ESPX, Debug, "...(%d left)", attemptsLeft);
     attemptsLeft--;
     if (status == WL_CONNECTED) {
       log(CLASS_ESPX, Debug, "Connected! %s", WiFi.localIP().toString().c_str());
       return true; // connected
     }
     if (attemptsLeft < 0) {
-      log(CLASS_ESPX, Warn, "Connection to '%s' failed %d", ssid, status);
+      log(CLASS_ESPX, Warn, "Connection failed %d", status);
       return false; // not connected
     }
   }
