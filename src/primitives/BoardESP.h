@@ -38,9 +38,12 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
   } else {
     httpClient.begin(url, fingerprint);
   }
-  log(CLASS_ESPX, Debug, "> %s:..%s", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
+  log(CLASS_ESPX, Fine, "> %s:..'%s'", HTTP_METHOD_STR(method), tailStr(url, URL_PRINT_MAX_LENGTH));
   for (KV kv = headers->next(KV()); kv.isValid(); kv = headers->next(kv)) {
     httpClient.addHeader(kv.getKey(), kv.getValue());
+#ifdef INSECURE
+    log(CLASS_ESPX, Fine, "- H '%s':'%s'", kv.getKey(), kv.getValue());
+#endif // INSECURE
   }
   switch(method) {
     case HttpPost:
@@ -58,10 +61,9 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
     default:
       log(CLASS_ESPX, Error, "Not supported %d HTTP method", (int)method);
       errorCode = -1;
-
   }
 
-  log(CLASS_ESPX, Debug, "< %d", errorCode);
+  log(CLASS_ESPX, Debug, "< %d (%s)", errorCode, httpClient.errorToString(errorCode).c_str());
   delay(WAIT_BEFORE_HTTP_MS);
   return HttpResponse(errorCode, httpClient.getStreamPtr(), httpClientEnd);
 }
