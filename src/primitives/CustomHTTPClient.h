@@ -8,15 +8,18 @@ class CustomHTTPClient : public HTTPClient {
 public:
 
   int sendRequestChunked(const char * type, Stream * stream) {
+    log(CLASS_CUSTOM_HTTP, Fine, "%s chunked", type);
 
     if(!stream) {
       clear();
+      log(CLASS_CUSTOM_HTTP, Warn, "No stream");
       return returnError(HTTPC_ERROR_NO_STREAM);
     }
 
     // connect to server
     if(!connect()) {
       clear();
+      log(CLASS_CUSTOM_HTTP, Warn, "No connection");
       return returnError(HTTPC_ERROR_CONNECTION_REFUSED);
     }
 
@@ -26,6 +29,7 @@ public:
     // send Header
     if(!sendHeader(type)) {
       clear();
+      log(CLASS_CUSTOM_HTTP, Warn, "Failed header");
       return returnError(HTTPC_ERROR_SEND_HEADER_FAILED);
     }
 
@@ -45,7 +49,7 @@ public:
         int sizeAvailable = stream->available();
 
         if(sizeAvailable) { // size cannot be -1: if != 0 then read bytes, otherwise wait until new data arrives
-          log(CLASS_CUSTOM_HTTP, Debug, "Avlble: '%d'", sizeAvailable);
+          log(CLASS_CUSTOM_HTTP, Fine, "Avl to send: %d b", sizeAvailable);
 
           int readBytes = sizeAvailable;
 
@@ -53,6 +57,8 @@ public:
           if(readBytes > buff_size) {
             readBytes = buff_size;
           }
+
+          log(CLASS_CUSTOM_HTTP, Fine, "Can send: %d b", readBytes);
 
           // read data
           int payloadBytesRead = stream->readBytes(payloadChunk, readBytes);
@@ -67,21 +73,23 @@ public:
           int payloadBytesWrite = _client->write((const uint8_t *) payloadChunk, payloadBytesRead);
           _client->write((const uint8_t *) "\r\n", 2);
 
-          log(CLASS_CUSTOM_HTTP, Fine, "Write: lhex='%s' cont='%s'", lenHex, payloadChunk);
+          log(CLASS_CUSTOM_HTTP, Fine, "Sent %d bytes: '%.8s(...)%s'", payloadBytesRead, payloadChunk, tailStr((const char*)payloadChunk, 8));
 
           // are all Bytes a writen to stream ?
           if(payloadBytesWrite != payloadBytesRead) {
-            log(CLASS_CUSTOM_HTTP, Warn, "Short write %d/%d", payloadBytesRead, payloadBytesWrite);
+            log(CLASS_CUSTOM_HTTP, Warn, "Short! (%d of %d b)", payloadBytesRead, payloadBytesWrite);
           }
 
           // check for write error
           if(_client->getWriteError()) {
-            log(CLASS_CUSTOM_HTTP, Warn, "Write error %d", _client->getWriteError());
+            log(CLASS_CUSTOM_HTTP, Warn, "Sent error %d", _client->getWriteError());
             free(payloadChunk);
             free(lenHex);
             clear();
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
           }
+
+          log(CLASS_CUSTOM_HTTP, Fine, "Part OK");
 
           delay(0);
         } else {
@@ -93,7 +101,7 @@ public:
 
       free(payloadChunk);
       free(lenHex);
-
+      log(CLASS_CUSTOM_HTTP, Debug, "Msg OK");
     } else {
       log(CLASS_CUSTOM_HTTP, Warn, "Not enough RAM / %d", HTTP_TCP_BUFFER_SIZE);
       clear();
