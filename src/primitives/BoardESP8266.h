@@ -15,6 +15,9 @@
 #include <primitives/CustomHTTPClient.h>
 #include <primitives/BoardESP.h>
 
+void espWdtFeed() {
+  ESP.wdtFeed();
+}
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
@@ -62,7 +65,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
 
   int attemptsLeft = retries;
   while (true) {
-    ESP.wdtFeed();
+    espWdtFeed();
     bool interrupt = lightSleepNotInterruptable(now(), WIFI_DELAY_MS / 1000, NULL);
     if (interrupt) {
       log(CLASS_ESPX, Warn, "Wifi init interrupted");
@@ -86,7 +89,7 @@ bool readFile(const char *fname, Buffer *content) {
   bool success = false;
   SPIFFS.begin();
   bool exists = SPIFFS.exists(fname);
-  ESP.wdtFeed();
+  espWdtFeed();
   if (!exists) {
     log(CLASS_ESPX, Warn, "File does not exist: %s", fname);
     content->clear();
@@ -109,7 +112,7 @@ bool readFile(const char *fname, Buffer *content) {
 }
 
 bool writeFile(const char *fname, const char *content) {
-  ESP.wdtFeed();
+  espWdtFeed();
   bool success = false;
   SPIFFS.begin();
   File f = SPIFFS.open(fname, "w+");
@@ -127,7 +130,7 @@ bool writeFile(const char *fname, const char *content) {
 }
 
 void updateFirmware(const char *url, const char *currentVersion) { // already connected to wifi
-  ESP.wdtFeed();
+  espWdtFeed();
   ESP8266HTTPUpdate updater;
 
   log(CLASS_ESPX, Warn, "Updating firmware from '%s'...", url);

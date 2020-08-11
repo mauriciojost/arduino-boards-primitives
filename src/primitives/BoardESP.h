@@ -18,6 +18,7 @@
 #define WIFI_DELAY_MS 2000
 #endif // WIFI_DELAY_MS
 
+void espWdtFeed();
 
 CustomHTTPClient httpClient;
 std::function<void ()> httpClientEnd = []() { httpClient.end();};
@@ -27,7 +28,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
     log(CLASS_ESP, Debug, "Wifi attempt %d", a);
     int n = WiFi.scanNetworks();
     for (int i = 0; i < n; ++i) {
-      ESP.wdtFeed();
+      espWdtFeed();
       String s = WiFi.SSID(i);
       if (strcmp(s.c_str(), ssid) == 0) {
         log(CLASS_ESP, Debug, "Wifi found '%s'", ssid);
@@ -44,7 +45,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
 
 HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table *headers, const char *fingerprint) {
   int errorCode;
-  ESP.wdtFeed();
+  espWdtFeed();
   if (fingerprint == NULL) {
     httpClient.begin(url);
   } else {
@@ -93,7 +94,7 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
     return true;
   }
   while (now() < cycleBegin + periodSecs) {
-    ESP.wdtFeed();
+    espWdtFeed();
     if (interrupt()) {
       return true;
     }
@@ -106,7 +107,7 @@ bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPerio
 bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)()) {
   log(CLASS_ESPX, Debug, "LS(%ds)...", (int)periodSecs);
   while (now() < cycleBegin + periodSecs) {
-    ESP.wdtFeed();
+    espWdtFeed();
     if (heartbeat) heartbeat();
     delay(1000);
   }
