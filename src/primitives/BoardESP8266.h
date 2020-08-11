@@ -16,12 +16,6 @@
 #include <primitives/BoardESP.h>
 
 
-#define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
-
-#ifndef WIFI_DELAY_MS
-#define WIFI_DELAY_MS 2000
-#endif // WIFI_DELAY_MS
-
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
@@ -68,6 +62,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
 
   int attemptsLeft = retries;
   while (true) {
+    ESP.wdtFeed();
     bool interrupt = lightSleepNotInterruptable(now(), WIFI_DELAY_MS / 1000, NULL);
     if (interrupt) {
       log(CLASS_ESPX, Warn, "Wifi init interrupted");
@@ -87,17 +82,11 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
   }
 }
 
-void stopWifi() {
-  log(CLASS_ESPX, Debug, "W.Off.");
-  WiFi.disconnect();
-  delay(WIFI_DELAY_MS);
-  WiFi.mode(WIFI_OFF); // to be removed after SDK update to 1.5.4
-  delay(WIFI_DELAY_MS);
-}
 bool readFile(const char *fname, Buffer *content) {
   bool success = false;
   SPIFFS.begin();
   bool exists = SPIFFS.exists(fname);
+  ESP.wdtFeed();
   if (!exists) {
     log(CLASS_ESPX, Warn, "File does not exist: %s", fname);
     content->clear();
@@ -120,6 +109,7 @@ bool readFile(const char *fname, Buffer *content) {
 }
 
 bool writeFile(const char *fname, const char *content) {
+  ESP.wdtFeed();
   bool success = false;
   SPIFFS.begin();
   File f = SPIFFS.open(fname, "w+");
@@ -137,6 +127,7 @@ bool writeFile(const char *fname, const char *content) {
 }
 
 void updateFirmware(const char *url, const char *currentVersion) { // already connected to wifi
+  ESP.wdtFeed();
   ESP8266HTTPUpdate updater;
 
   log(CLASS_ESPX, Warn, "Updating firmware from '%s'...", url);
@@ -162,27 +153,6 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
       break;
   }
 }
-void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
-  log(CLASS_ESPX, Info, "DS(period=%d)", (int)periodSecs);
-  deepSleepNotInterruptableSecs(cycleBegin, periodSecs);
-  delay(5000); // the above statement is async, wait until effective
-}
-
-bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
-  log(CLASS_ESPX, Debug, "LS(%ds)...", (int)periodSecs);
-  if (interrupt()) { // first quick check before any time considerations
-    return true;
-  }
-  while (now() < cycleBegin + periodSecs) {
-    if (interrupt()) {
-      return true;
-    }
-    if (heartbeat) heartbeat();
-    delay(miniPeriodMsec);
-  }
-  return false;
-}
-
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   time_t p = CONSTRAIN_VALUE(periodSecs, 0, MAX_DEEP_SLEEP_PERIOD_SECS);
   log(CLASS_ESPX, Info, "DS(%ds)...", (int)p);
@@ -193,13 +163,5 @@ void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
   }
 }
 
-bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)()) {
-  log(CLASS_ESPX, Debug, "LS(%ds)...", (int)periodSecs);
-  while (now() < cycleBegin + periodSecs) {
-    if (heartbeat) heartbeat();
-    delay(1000);
-  }
-  return false;
-}
 
 #endif // ESP8266

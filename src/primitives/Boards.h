@@ -9,6 +9,8 @@
 #include <main4ino/HttpMethods.h>
 #include <main4ino/HttpResponse.h>
 
+#define CLASS_BOARDS "BS"
+
 enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 
 #ifndef MAIN4INOSERVER_API_HOST_BASE 
@@ -39,9 +41,13 @@ void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
 void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
 void updateFirmwareFromMain4ino(const char* session, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
+#ifndef UPDATE_FIRMWARE_MAIN4INO_DISABLED
   Buffer aux(UPDATE_FIRMWARE_URL_MAX_LENGTH);
   aux.fill(FIRMWARE_UPDATE_URL, session, device, project, platform, targetVersion);
   updateFirmware(aux.getBuffer(), currentVersion);
+#else // UPDATE_FIRMWARE_MAIN4INO_DISABLED
+  log(CLASS_BOARDS, Warn, "Update disabled");
+#endif // UPDATE_FIRMWARE_MAIN4INO_DISABLED
 }
 
 #endif // BOARDS_INC

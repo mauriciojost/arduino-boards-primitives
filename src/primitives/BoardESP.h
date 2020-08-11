@@ -9,6 +9,16 @@
 #define URL_PRINT_MAX_LENGTH 20
 #endif // URL_PRINT_MAX_LENGTH
 
+
+#define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
+
+
+
+#ifndef WIFI_DELAY_MS
+#define WIFI_DELAY_MS 2000
+#endif // WIFI_DELAY_MS
+
+
 CustomHTTPClient httpClient;
 std::function<void ()> httpClientEnd = []() { httpClient.end();};
 
@@ -17,6 +27,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
     log(CLASS_ESP, Debug, "Wifi attempt %d", a);
     int n = WiFi.scanNetworks();
     for (int i = 0; i < n; ++i) {
+      ESP.wdtFeed();
       String s = WiFi.SSID(i);
       if (strcmp(s.c_str(), ssid) == 0) {
         log(CLASS_ESP, Debug, "Wifi found '%s'", ssid);
@@ -33,6 +44,7 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
 
 HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table *headers, const char *fingerprint) {
   int errorCode;
+  ESP.wdtFeed();
   if (fingerprint == NULL) {
     httpClient.begin(url);
   } else {
@@ -66,6 +78,47 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
   log(CLASS_ESPX, Debug, "< %d (%s)", errorCode, httpClient.errorToString(errorCode).c_str());
   delay(WAIT_BEFORE_HTTP_MS);
   return HttpResponse(errorCode, httpClient.getStreamPtr(), httpClientEnd);
+}
+
+
+void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
+  log(CLASS_ESPX, Info, "DS(period=%d)", (int)periodSecs);
+  deepSleepNotInterruptableSecs(cycleBegin, periodSecs);
+  delay(5000); // the above statement is async, wait until effective
+}
+
+bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
+  log(CLASS_ESPX, Debug, "LS(%ds)...", (int)periodSecs);
+  if (interrupt()) { // first quick check before any time considerations
+    return true;
+  }
+  while (now() < cycleBegin + periodSecs) {
+    ESP.wdtFeed();
+    if (interrupt()) {
+      return true;
+    }
+    if (heartbeat) heartbeat();
+    delay(miniPeriodMsec);
+  }
+  return false;
+}
+
+bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)()) {
+  log(CLASS_ESPX, Debug, "LS(%ds)...", (int)periodSecs);
+  while (now() < cycleBegin + periodSecs) {
+    ESP.wdtFeed();
+    if (heartbeat) heartbeat();
+    delay(1000);
+  }
+  return false;
+}
+
+void stopWifi() {
+  log(CLASS_ESPX, Debug, "W.Off.");
+  WiFi.disconnect();
+  delay(WIFI_DELAY_MS);
+  WiFi.mode(WIFI_OFF); // to be removed after SDK update to 1.5.4
+  delay(WIFI_DELAY_MS);
 }
 
 
