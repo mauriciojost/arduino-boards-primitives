@@ -73,8 +73,6 @@ public:
           int payloadBytesWrite = _client->write((const uint8_t *) payloadChunk, payloadBytesRead);
           _client->write((const uint8_t *) "\r\n", 2);
 
-          log(CLASS_CUSTOM_HTTP, Fine, "Sent %d bytes: '%.8s(...)%s'", payloadBytesRead, payloadChunk, tailStr((const char*)payloadChunk, 8));
-
           // are all Bytes a writen to stream ?
           if(payloadBytesWrite != payloadBytesRead) {
             log(CLASS_CUSTOM_HTTP, Warn, "Short! (%d of %d b)", payloadBytesRead, payloadBytesWrite);
