@@ -1,6 +1,6 @@
 #ifdef X86_64
 
-#define CLASS_X8664 "64"
+#define CLASS_X8664 "BO"
 
 #include <log4ino/Log.h>
 

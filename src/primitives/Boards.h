@@ -9,7 +9,7 @@
 #include <main4ino/HttpMethods.h>
 #include <main4ino/HttpResponse.h>
 
-#define CLASS_BOARDS "BS"
+#define CLASS_BOARDS "BO"
 
 enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 

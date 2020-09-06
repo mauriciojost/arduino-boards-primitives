@@ -1,7 +1,7 @@
 #ifndef ESP_INC
 #define ESP_INC
 
-#define CLASS_ESP "ES"
+#define CLASS_ESP "BO"
 #define NRO_ATTEMPTS 5
 #define WAIT_BEFORE_HTTP_MS 100
 

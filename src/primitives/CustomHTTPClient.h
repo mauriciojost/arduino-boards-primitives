@@ -1,7 +1,7 @@
 #ifndef CUSTOM_HTTP_CLIENT_INC
 #define CUSTOM_HTTP_CLIENT_INC
 
-#define CLASS_CUSTOM_HTTP "CH"
+#define CLASS_CUSTOM_HTTP "CU"
 
 class CustomHTTPClient : public HTTPClient {
 

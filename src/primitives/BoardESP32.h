@@ -1,6 +1,6 @@
 #ifdef ESP32 // NODEMCU based on ESP32
 
-#define CLASS_ESPX "32"
+#define CLASS_ESPX "BO"
 
 #include <log4ino/Log.h>
 #include <main4ino/Timing.h>
