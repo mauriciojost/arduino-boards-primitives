@@ -91,13 +91,13 @@ bool readFile(const char *fname, Buffer *content) {
   bool exists = SPIFFS.exists(fname);
   espWdtFeed();
   if (!exists) {
-    log(CLASS_ESPX, Warn, "File does not exist: %s", fname);
+    log(CLASS_ESPX, Debug, "File does not exist: %s", fname);
     content->clear();
     success = false;
   } else {
     File f = SPIFFS.open(fname, "r");
     if (!f) {
-      log(CLASS_ESPX, Warn, "File reading failed: %s", fname);
+      log(CLASS_ESPX, Debug, "File reading failed: %s", fname);
       content->clear();
       success = false;
     } else {
