@@ -29,6 +29,10 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
 #endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
 
+#ifndef ROLLBACK_THRESHOLD_FAILURES
+#define ROLLBACK_THRESHOLD_FAILURES 2
+#endif // ROLLBACK_THRESHOLD_FAILURES
+
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
 HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table *headers, const char *fingerprint);
@@ -49,5 +53,29 @@ void updateFirmwareFromMain4ino(const char* session, const char *device, const c
   log(CLASS_BOARDS, Warn, "Update disabled");
 #endif // UPDATE_FIRMWARE_MAIN4INO_DISABLED
 }
+
+void startup(
+  const char* project,
+  const char* version,
+  const char* deviceId,
+  int (*failuresInPast)(),
+  void (*reportFailureLogs)(),
+  void (*cleanFailures)(),
+  void (*rollback)()
+) {
+  log(CLASS_BOARDS, User, "*%s", project);
+  log(CLASS_BOARDS, User, "*%s", version);
+  log(CLASS_BOARDS, User, "*%s", deviceId);
+
+  int failures = failuresInPast();
+  if (failures > 0) {
+    reportFailureLogs();
+    cleanFailures();
+    if (failures > ROLLBACK_THRESHOLD_FAILURES) {
+      rollback();
+    }
+  }
+}
+
 
 #endif // BOARDS_INC
