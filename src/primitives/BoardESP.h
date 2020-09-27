@@ -62,11 +62,11 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
   switch(method) {
     case HttpPost:
       log(CLASS_ESPX, Debug, "> POST");
-      errorCode = httpClient.sendRequestChunked("POST", body);
+      errorCode = httpClient.sendRequestChunked("POST", body, espWdtFeed);
       break;
     case HttpUpdate:
       log(CLASS_ESPX, Debug, "> PUT");
-      errorCode = httpClient.sendRequestChunked("PUT", body);
+      errorCode = httpClient.sendRequestChunked("PUT", body, espWdtFeed);
       break;
     case HttpGet:
       log(CLASS_ESPX, Debug, "> GET");

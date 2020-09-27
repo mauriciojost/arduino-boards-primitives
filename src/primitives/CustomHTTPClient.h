@@ -7,7 +7,7 @@ class CustomHTTPClient : public HTTPClient {
 
 public:
 
-  int sendRequestChunked(const char * type, Stream * stream) {
+  int sendRequestChunked(const char * type, Stream * stream, void (*heartbeat)()) {
     log(CLASS_CUSTOM_HTTP, Fine, "%s chunked", type);
 
     if(!stream) {
@@ -42,6 +42,7 @@ public:
     if(payloadChunk) {
       // read all data from stream and send it to server
       while(connected() && (stream->available() > -1)) {
+        heartbeat();
 
         memset(payloadChunk, 0, buff_size);
 
