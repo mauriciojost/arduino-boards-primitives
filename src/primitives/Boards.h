@@ -41,8 +41,15 @@ bool writeFile(const char *fname, const char *content);
 void updateFirmware(const char *url, const char *currentVersion);
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)());
 bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*heartbeat)());
+
+/* 
+ * Deep sleep, lowest power consumption sleep followed by a reset. 
+ * Instead of the duration of the sleep, this method receives the beginning of the 
+ * cycle and the period until next cycle, and calculates the time to sleep to keep the right frequency.
+ * @param cycleBegin when the cycle started (can use now() to start from now)
+ * @param periodSecs what is the period between cycles
+*/
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
-void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs);
 
 void updateFirmwareFromMain4ino(const char* session, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
 #ifndef UPDATE_FIRMWARE_MAIN4INO_DISABLED

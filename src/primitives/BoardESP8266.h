@@ -156,14 +156,8 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
       break;
   }
 }
-void deepSleepNotInterruptableSecs(time_t cycleBegin, time_t periodSecs) {
-  time_t p = CONSTRAIN_VALUE(periodSecs, 0, MAX_DEEP_SLEEP_PERIOD_SECS);
-  log(CLASS_ESPX, Info, "DS(%ds)...", (int)p);
-  time_t spentSecs = now() - cycleBegin;
-  time_t leftSecs = p - spentSecs;
-  if (leftSecs > 0) {
-    ESP.deepSleep(leftSecs * FACTOR_USEC_TO_SEC_DEEP_SLEEP, WAKE_RF_DEFAULT);
-  }
+void deepSleepNotInterruptableSecsRaw(time_t t) {
+  ESP.deepSleep(t * FACTOR_USEC_TO_SEC_DEEP_SLEEP, WAKE_RF_DEFAULT);
 }
 
 

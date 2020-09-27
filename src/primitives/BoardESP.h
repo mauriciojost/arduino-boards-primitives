@@ -11,8 +11,7 @@
 
 
 #define MAX_DEEP_SLEEP_PERIOD_SECS 2100 // 35 minutes
-
-
+#define MIN_DEEP_SLEEP_PERIOD_SECS 1 // 1 second
 
 #ifndef WIFI_DELAY_MS
 #define WIFI_DELAY_MS 2000
@@ -22,6 +21,8 @@ void espWdtFeed();
 
 CustomHTTPClient httpClient;
 std::function<void ()> httpClientEnd = []() { httpClient.end();};
+
+void deepSleepNotInterruptableSecsRaw(time_t periodSecs);
 
 WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
   for (int a = 0; a < NRO_ATTEMPTS; a++) {
@@ -83,9 +84,10 @@ HttpResponse httpMethod(HttpMethod method, const char *url, Stream *body, Table 
 
 
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs) {
-  log(CLASS_ESPX, Info, "DS(period=%d)", (int)periodSecs);
-  deepSleepNotInterruptableSecs(cycleBegin, periodSecs);
-  delay(5000); // the above statement is async, wait until effective
+  time_t spentSecs = now() - cycleBegin;
+  time_t leftSecs = CONSTRAIN_VALUE(periodSecs - spentSecs, MIN_DEEP_SLEEP_PERIOD_SECS, MAX_DEEP_SLEEP_PERIOD_SECS);
+  log(CLASS_ESPX, Info, "DS(%ds)...", (int)leftSecs);
+  deepSleepNotInterruptableSecsRaw(leftSecs);
 }
 
 bool lightSleepInterruptable(time_t cycleBegin, time_t periodSecs, int miniPeriodMsec, bool (*interrupt)(), void (*heartbeat)()) {
