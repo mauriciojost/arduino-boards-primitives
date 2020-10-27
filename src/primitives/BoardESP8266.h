@@ -22,41 +22,41 @@ void espWdtFeed() {
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries) {
   wl_status_t status;
 
-  log(CLASS_ESPX, Debug, "WifiIn(%s) '%s'/'%s'", BOOL(skipIfConnected), ssid, ssidb);
+  log(CLASS_ESPX, Fine, "WifiIn(%s) '%s'/'%s'", BOOL(skipIfConnected), ssid, ssidb);
   bool wifiIsOff = (wifi_get_opmode() == NULL_MODE);
   if (wifiIsOff) {
-    log(CLASS_ESPX, Debug, "Turning on...");
+    log(CLASS_ESPX, Fine, "Turning on...");
     wifi_fpm_do_wakeup();
     wifi_fpm_close();
     wifi_set_opmode(STATION_MODE);
     wifi_station_connect();
   } else {
-    log(CLASS_ESPX, Debug, "On already");
+    log(CLASS_ESPX, Fine, "On already");
   }
 
   if (skipIfConnected) { // check if connected
-    log(CLASS_ESPX, Debug, "Already connected?");
+    log(CLASS_ESPX, Fine, "Already connected?");
     status = WiFi.status();
     if (status == WL_CONNECTED) {
-      log(CLASS_ESPX, Info, "IP: %s", WiFi.localIP().toString().c_str());
+      log(CLASS_ESPX, Fine, "IP: %s", WiFi.localIP().toString().c_str());
       return true; // connected
     }
   } else {
     stopWifi();
   }
 
-  log(CLASS_ESPX, Debug, "Scanning...");
+  log(CLASS_ESPX, Fine, "Scanning...");
   WifiNetwork w = detectWifi(ssid, ssidb);
 
   WiFi.mode(WIFI_STA);
   delay(WIFI_DELAY_MS);
   switch (w) {
     case WifiMainNetwork:
-      log(CLASS_ESPX, Debug, "%s => Connecting...", ssid);
+      log(CLASS_ESPX, Fine, "%s => Connecting...", ssid);
       WiFi.begin(ssid, pass);
       break;
     case WifiBackupNetwork:
-      log(CLASS_ESPX, Debug, "%s => Connecting...", ssidb);
+      log(CLASS_ESPX, Fine, "%s => Connecting...", ssidb);
       WiFi.begin(ssidb, passb);
       break;
     default:
@@ -72,10 +72,10 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
       return false; // not connected
     }
     status = WiFi.status();
-    log(CLASS_ESPX, Debug, "...(%d left)", attemptsLeft);
+    log(CLASS_ESPX, Fine, "...(%d left)", attemptsLeft);
     attemptsLeft--;
     if (status == WL_CONNECTED) {
-      log(CLASS_ESPX, Debug, "Connected! %s", WiFi.localIP().toString().c_str());
+      log(CLASS_ESPX, Fine, "Connected! %s", WiFi.localIP().toString().c_str());
       return true; // connected
     }
     if (attemptsLeft < 0) {
