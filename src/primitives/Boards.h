@@ -70,8 +70,8 @@ void startup(
   void (*cleanFailures)(),
   void (*rollback)()
 ) {
-  log(CLASS_BOARDS, User, "d=%s v=%s p=%s f=%d", deviceId, version, project, failures);
   int failures = failuresInPast();
+  log(CLASS_BOARDS, User, "d=%s v=%s p=%s f=%d", deviceId, version, project, failures);
   if (failures > 0) {
     reportFailureLogs();
     cleanFailures();
