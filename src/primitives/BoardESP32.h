@@ -157,17 +157,17 @@ int failuresInPast() {
 }
 
 void reportFailureLogs() {
-  log(CLASS_PLATFORM, Error, "Had aborted!!!");
-  log(CLASS_PLATFORM, Error, "%s", STRINGIFY(PROJ_VERSION));
+  log(CLASS_ESPX, Error, "Had aborted!!!");
+  log(CLASS_ESPX, Error, "%s", STRINGIFY(PROJ_VERSION));
   {
     Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
     bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
     if (abrt) {
-      logRaw(CLASS_PLATFORM, Error, "==>" ABORT_LOG_FILENAME);
-      logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
-      logRaw(CLASS_PLATFORM, Error, "<==");
+      logRaw(CLASS_ESPX, Error, "==>" ABORT_LOG_FILENAME);
+      logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
+      logRaw(CLASS_ESPX, Error, "<==");
     } else {
-      log(CLASS_PLATFORM, Error, "File not found");
+      log(CLASS_ESPX, Error, "File not found");
     }
   }
 }

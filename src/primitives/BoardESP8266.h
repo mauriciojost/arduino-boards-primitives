@@ -178,24 +178,24 @@ void reportFailureLogs() { // failures in previous life detected, report them no
   {
     Buffer fheader(ABORT_LOG_HEADER_LENGTH);
     fheader.fill("Had aborted!!! v=%s", STRINGIFY(PROJ_VERSION));
-    logRaw(CLASS_PLATFORM, Error, fheader.getBuffer());
+    logRaw(CLASS_ESPX, Error, fheader.getBuffer());
   }
 
   if (espSaveCrash.count() > 0) {
     // crash, stacktrace available, no more
     Buffer fcontent(STACKTRACE_MAX_LENGTH);
     espSaveCrash.print(fcontent.getUnsafeBuffer(), STACKTRACE_MAX_LENGTH);
-    logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
+    logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
   } else {
     // no crash, so abort should have taken place
     Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
     bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
     if (abrt) {
-      logRaw(CLASS_PLATFORM, Error, "==>" ABORT_LOG_FILENAME);
-      logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
-      logRaw(CLASS_PLATFORM, Error, "<==");
+      logRaw(CLASS_ESPX, Error, "==>" ABORT_LOG_FILENAME);
+      logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
+      logRaw(CLASS_ESPX, Error, "<==");
     } else {
-      log(CLASS_PLATFORM, Error, "File not found");
+      log(CLASS_ESPX, Error, "File not found");
     }
   }
 }

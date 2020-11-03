@@ -186,8 +186,8 @@ void logLineOnto(const char *str, const char *clz, LogLevel l, bool newline, uns
 }
 
 void reportAbort(Buffer msg) {
-  log(CLASS_PLATFORM, Error, "Abort!");
-  logRaw(CLASS_PLATFORM, Error, msg.getBuffer());
+  log(CLASS_ESPX, Error, "Abort!");
+  logRaw(CLASS_ESPX, Error, msg.getBuffer());
 
   Buffer fheader(ABORT_LOG_HEADER_LENGTH); // header
   fheader.fill("ABORT msg=%s v=%s t=%ld", msg.getBuffer(), now(), STRINGIFY(PROJ_VERSION));
