@@ -14,6 +14,9 @@
 #include <primitives/Boards.h>
 #include <primitives/CustomHTTPClient.h>
 #include <primitives/BoardESP.h>
+#include <EspSaveCrash.h>
+
+EspSaveCrash espSaveCrash;
 
 void espWdtFeed() {
   ESP.wdtFeed();
@@ -158,6 +161,50 @@ void updateFirmware(const char *url, const char *currentVersion) { // already co
 }
 void deepSleepNotInterruptableSecsRaw(time_t t) {
   ESP.deepSleep(t * FACTOR_USEC_TO_SEC_DEEP_SLEEP, WAKE_RF_DEFAULT);
+}
+
+int failuresInPast() {
+  // Useful links for debugging:
+  // https://links2004.github.io/Arduino/dc/deb/md_esp8266_doc_exception_causes.html
+  // ./packages/framework-arduinoespressif8266@2.20502.0/tools/sdk/include/user_interface.h
+  // https://bitbucket.org/mauriciojost/esp8266-stacktrace-translator/src/master/
+  int e = espSaveCrash.count();
+  Buffer fcontent(16);
+  bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+  return e + (abrt?1:0);
+}
+
+void reportFailureLogs() { // failures in previous life detected, report them now
+  {
+    Buffer fheader(ABORT_LOG_HEADER_LENGTH);
+    fheader.fill("Had aborted!!! v=%s", STRINGIFY(PROJ_VERSION));
+    logRaw(CLASS_PLATFORM, Error, fheader.getBuffer());
+  }
+
+  if (espSaveCrash.count() > 0) {
+    // crash, stacktrace available, no more
+    Buffer fcontent(STACKTRACE_MAX_LENGTH);
+    espSaveCrash.print(fcontent.getUnsafeBuffer(), STACKTRACE_MAX_LENGTH);
+    logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
+  } else {
+    // no crash, so abort should have taken place
+    Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
+    bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+    if (abrt) {
+      logRaw(CLASS_PLATFORM, Error, "==>" ABORT_LOG_FILENAME);
+      logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
+      logRaw(CLASS_PLATFORM, Error, "<==");
+    } else {
+      log(CLASS_PLATFORM, Error, "File not found");
+    }
+  }
+}
+
+void cleanFailures() {
+  SPIFFS.begin();
+  SPIFFS.remove(ABORT_LOG_FILENAME);
+  SPIFFS.end();
+  espSaveCrash.clear();
 }
 
 

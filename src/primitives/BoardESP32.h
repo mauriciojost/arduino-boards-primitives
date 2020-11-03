@@ -146,5 +146,34 @@ void deepSleepNotInterruptableSecsRaw(time_t t) {
   ESP.deepSleep(t * FACTOR_USEC_TO_SEC_DEEP_SLEEP);
 }
 
+int failuresInPast() {
+  // Useful links for debugging:
+  // https://links2004.github.io/Arduino/dc/deb/md_esp8266_doc_exception_causes.html
+  // ./packages/framework-arduinoespressif8266@2.20502.0/tools/sdk/include/user_interface.h
+  // https://bitbucket.org/mauriciojost/esp8266-stacktrace-translator/src/master/
+  Buffer fcontent(16);
+  bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+  return abrt?1:0;
+}
+
+void reportFailureLogs() {
+  log(CLASS_PLATFORM, Error, "Had aborted!!!");
+  log(CLASS_PLATFORM, Error, "%s", STRINGIFY(PROJ_VERSION));
+  {
+    Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
+    bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+    if (abrt) {
+      logRaw(CLASS_PLATFORM, Error, "==>" ABORT_LOG_FILENAME);
+      logRaw(CLASS_PLATFORM, Error, fcontent.getBuffer());
+      logRaw(CLASS_PLATFORM, Error, "<==");
+    } else {
+      log(CLASS_PLATFORM, Error, "File not found");
+    }
+  }
+}
+
+void cleanFailures() {
+  SPIFFS.remove(ABORT_LOG_FILENAME);
+}
 
 #endif // ESP32
