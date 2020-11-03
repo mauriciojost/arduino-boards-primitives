@@ -185,17 +185,17 @@ void logLineOnto(const char *str, const char *clz, LogLevel l, bool newline, uns
   }
 }
 
-void reportAbort(Buffer msg) {
+void reportAbort(Buffer msg, Buffer* logs) {
   log(CLASS_ESPX, Error, "Abort!");
   logRaw(CLASS_ESPX, Error, msg.getBuffer());
 
   Buffer fheader(ABORT_LOG_HEADER_LENGTH); // header
   fheader.fill("ABORT msg=%s v=%s t=%ld", msg.getBuffer(), now(), STRINGIFY(PROJ_VERSION));
 
-  logBuffer->last(ABORT_LOG_BODY_MAX_LENGTH); // body
+  logs->last(ABORT_LOG_BODY_MAX_LENGTH); // body
 
   Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH); // full file content
-  fcontent.fill("%s\n...\n%s\n...\n", fheader.getBuffer(), logBuffer->getBuffer());
+  fcontent.fill("%s\n...\n%s\n...\n", fheader.getBuffer(), logs->getBuffer());
 
   writeFile(ABORT_LOG_FILENAME, fcontent.getBuffer());
 }
