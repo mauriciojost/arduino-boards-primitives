@@ -24,6 +24,25 @@
 // The ESP8266 is a complicated non-trivial uC when it comes to behavior of its GPIO at boot. Some pins are not usable, some are output for a few tens of ms (even before getting to the setup() routine call), etc. Better read:
 https://rabbithole.wwwdotorg.org/2017/03/28/esp8266-gpio.html
 
+/*
+
+NodeMCU
+GPIOESP8266    GPIOBehaviour     Flash ModeBehaviour   Dummy Arduino AppBehaviour    Arduino Set GPIOs Low
+D0 16   High   High during boot, falls after ~110ms (to ~1V?)   High during boot, falls after ~110ms (to ~1V)
+D1 5 Low Low Low
+D2 4 Low Low Low 
+D3 0 Low then oscillatesVaries, stabilizes high after ~100msVaries, stabilizes low after ~110ms
+D4 2 Varies, stabilizes high after ~60msVaries, stabilizes high after ~70msVaries, stabilizes low after ~110ms
+D5 14 High High, then low after ~110msHigh, then low after ~110ms
+D6 12 High High, then low after ~110msHigh, then low after ~110ms
+D7 13 High High, then low after ~110msHigh, then low after ~110ms
+D8 15 Low Low, with glitch ~110msLow, with glitch ~110ms
+D9 3 Low Low until ~50ms then highLow until ~50ms then high until ~110ms then low
+D10 1 Low Low until ~50ms then highLow until ~50ms then high until ~110ms then low
+
+*/
+
+
 
 // BOOT MODE
 // (*) such pin participates in boot mode, so pull ups/down resistors are needed.
