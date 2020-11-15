@@ -4,8 +4,8 @@
 #define GPIO1_PIN 1 // 
 #define GPIO2_PIN 2 // *
 #define GPIO3_PIN 3 // 
-#define GPIO4_PIN 4 // 
-#define GPIO5_PIN 5 // 
+#define GPIO4_PIN 4 // @
+#define GPIO5_PIN 5 // @
 //#define GPIO6_PIN 6 // can't be used as connected to flash
 //#define GPIO7_PIN 7 // can't be used as connected to flash
 //#define GPIO8_PIN 8 // can't be used as connected to flash
@@ -20,6 +20,7 @@
 #define A0_PIN 17  // 
 
 // BOOT TRANSIENTS
+// (@) such pins are stable low digital outputs at boot time, and are the only ones that can be used reliably (no transients, well defined behabiour) to control loads like relays, motors, servos, etc.
 // The ESP8266 is a complicated non-trivial uC when it comes to behavior of its GPIO at boot. Some pins are not usable, some are output for a few tens of ms (even before getting to the setup() routine call), etc. Better read:
 https://rabbithole.wwwdotorg.org/2017/03/28/esp8266-gpio.html
 
