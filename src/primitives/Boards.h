@@ -29,9 +29,9 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
 #endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
 
-#ifndef ROLLBACK_THRESHOLD_FAILURES
-#define ROLLBACK_THRESHOLD_FAILURES 2
-#endif // ROLLBACK_THRESHOLD_FAILURES
+#ifndef SAFEPOINT_THRESHOLD_FAILURES
+#define SAFEPOINT_THRESHOLD_FAILURES 0
+#endif // SAFEPOINT_THRESHOLD_FAILURES
 
 bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const char *passb, bool skipIfConnected, int retries);
 void stopWifi();
@@ -68,15 +68,15 @@ void startup(
   int (*failuresInPast)(),
   void (*reportFailureLogs)(),
   void (*cleanFailures)(),
-  void (*rollback)()
+  void (*safepoint)()
 ) {
   int failures = failuresInPast();
   log(CLASS_BOARDS, User, "d=%s v=%s p=%s f=%d", deviceId, version, project, failures);
   if (failures > 0) {
     reportFailureLogs();
     cleanFailures();
-    if (failures > ROLLBACK_THRESHOLD_FAILURES) {
-      rollback();
+    if (failures > SAFEPOINT_THRESHOLD_FAILURES) {
+      safepoint();
     }
   }
 }
