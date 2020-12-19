@@ -2,7 +2,7 @@
 
 #define GPIO0_PIN 0     // (*)
 #define GPIO1_PIN 1     // 
-#define GPIO2_PIN 2     // (*)
+#define GPIO2_PIN 2     // built-in LED (*) (?)
 #define GPIO3_PIN 3     // 
 #define GPIO4_PIN 4     // (@)
 #define GPIO5_PIN 5     // (@)
