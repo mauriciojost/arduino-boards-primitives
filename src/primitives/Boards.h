@@ -21,10 +21,6 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define UPDATE_FIRMWARE_URL_MAX_LENGTH 512
 #endif // UPDATE_FIRMWARE_URL_MAX_LENGTH
 
-// convention for firmware file name: firmware-<version>.<platform>.bin
-// to replace: base + project + version + platform
-#define FIRMWARE_UPDATE_URL MAIN4INOSERVER_API_HOST_BASE "/api/v1/session/%s/devices/%s/firmware/firmwares/%s/%s/content?version=%s"
-
 #ifndef FACTOR_USEC_TO_SEC_DEEP_SLEEP
 #define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
 #endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
@@ -50,16 +46,6 @@ bool lightSleepNotInterruptable(time_t cycleBegin, time_t periodSecs, void (*hea
  * @param periodSecs what is the period between cycles
 */
 void deepSleepNotInterruptable(time_t cycleBegin, time_t periodSecs);
-
-void updateFirmwareFromMain4ino(const char* session, const char *device, const char *project, const char* platform, const char *targetVersion, const char* currentVersion) {
-#ifndef UPDATE_FIRMWARE_MAIN4INO_DISABLED
-  Buffer aux(UPDATE_FIRMWARE_URL_MAX_LENGTH);
-  aux.fill(FIRMWARE_UPDATE_URL, session, device, project, platform, targetVersion);
-  updateFirmware(aux.getBuffer(), currentVersion);
-#else // UPDATE_FIRMWARE_MAIN4INO_DISABLED
-  log(CLASS_BOARDS, Warn, "Update disabled");
-#endif // UPDATE_FIRMWARE_MAIN4INO_DISABLED
-}
 
 void startup(
   const char* project,
