@@ -102,15 +102,20 @@ bool readFile(const char *fname, Buffer *content) {
 bool writeFile(const char *fname, const char *content) {
   bool success = false;
   FILE *file = fopen(fname, "w+");
-  int results = fputs(content, file);
-  if (results == EOF) {
-    log(CLASS_X8664, Warn, "Failed to write %s ", fname);
-    success = false;
+  if (file != NULL) {
+    int results = fputs(content, file);
+    if (results == EOF) {
+      log(CLASS_X8664, Warn, "Failed to write %s ", fname);
+      success = false;
+    } else {
+      success = true;
+    }
+    fclose(file);
+    return success;
   } else {
-    success = true;
+    log(CLASS_X8664, Warn, "Cant write to %s ", fname);
+    return success;
   }
-  fclose(file);
-  return success;
 }
 
 void updateFirmware(const char *url, const char *currentVersion) {
