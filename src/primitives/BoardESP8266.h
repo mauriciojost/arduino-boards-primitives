@@ -180,23 +180,39 @@ void reportFailureLogs() { // failures in previous life detected, report them no
     fheader.fill("Had aborted!!! v=%s", STRINGIFY(PROJ_VERSION));
     logRaw(CLASS_ESPX, Error, fheader.getBuffer());
   }
-
-  if (espSaveCrash.count() > 0) {
+  log(CLASS_ESPX, Error, "Crashes: %d", espSaveCrash.count());
+  if (espSaveCrash.count() == 1) {
+	  // report if only one to be reported, because reporting many
+		// can cause (as it happened) too long for the report, causing WDT
+		// to trigger, causing more crashes, so better limit to 1 the amount
+		// of crashes to be reported at a time
+    espWdtFeed();
     // crash, stacktrace available, no more
-    Buffer fcontent(STACKTRACE_MAX_LENGTH);
-    espSaveCrash.print(fcontent.getUnsafeBuffer(), STACKTRACE_MAX_LENGTH);
-    logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
+    
+    Buffer* fcontent = new Buffer(STACKTRACE_MAX_LENGTH);
+    
+
+    espSaveCrash.print();
+		espWdtFeed();
+    espSaveCrash.print(fcontent->getUnsafeBuffer(), STACKTRACE_MAX_LENGTH - 8);
+    logRaw(CLASS_ESPX, Error, fcontent->getBuffer());
+    delete fcontent;
+  } else if (espSaveCrash.count() > 1) {
+    logRaw(CLASS_ESPX, Error, "Many crashes, previous one reported already");
   } else {
     // no crash, so abort should have taken place
-    Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
+    espWdtFeed();
     bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+    Buffer* fcontent = new Buffer(ABORT_LOG_FILE_MAX_LENGTH);
+    bool abrt = readFile(ABORT_LOG_FILENAME, fcontent);
     if (abrt) {
       logRaw(CLASS_ESPX, Error, "==>" ABORT_LOG_FILENAME);
-      logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
+      logRaw(CLASS_ESPX, Error, fcontent->getBuffer());
       logRaw(CLASS_ESPX, Error, "<==");
     } else {
       log(CLASS_ESPX, Error, "File not found");
     }
+    delete fcontent;
   }
 }
 

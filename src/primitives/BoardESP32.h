@@ -160,15 +160,16 @@ void reportFailureLogs() {
   log(CLASS_ESPX, Error, "Had aborted!!!");
   log(CLASS_ESPX, Error, "%s", STRINGIFY(PROJ_VERSION));
   {
-    Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH);
-    bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
+    Buffer* fcontent = new Buffer(ABORT_LOG_FILE_MAX_LENGTH);
+    bool abrt = readFile(ABORT_LOG_FILENAME, fcontent);
     if (abrt) {
       logRaw(CLASS_ESPX, Error, "==>" ABORT_LOG_FILENAME);
-      logRaw(CLASS_ESPX, Error, fcontent.getBuffer());
+      logRaw(CLASS_ESPX, Error, fcontent->getBuffer());
       logRaw(CLASS_ESPX, Error, "<==");
     } else {
       log(CLASS_ESPX, Error, "File not found");
     }
+    delete fcontent;
   }
 }
 

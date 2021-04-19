@@ -194,10 +194,11 @@ void reportAbort(Buffer msg, Buffer* logs) {
 
   logs->last(ABORT_LOG_BODY_MAX_LENGTH); // body
 
-  Buffer fcontent(ABORT_LOG_FILE_MAX_LENGTH); // full file content
-  fcontent.fill("%s\n...\n%s\n...\n", fheader.getBuffer(), logs->getBuffer());
+  Buffer* fcontent = new Buffer(ABORT_LOG_FILE_MAX_LENGTH); // full file content
+  fcontent->fill("%s\n...\n%s\n...\n", fheader.getBuffer(), logs->getBuffer());
 
-  writeFile(ABORT_LOG_FILENAME, fcontent.getBuffer());
+  writeFile(ABORT_LOG_FILENAME, fcontent->getBuffer());
+  delete fcontent;
 }
 
 

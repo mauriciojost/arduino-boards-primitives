@@ -17,10 +17,6 @@ enum WifiNetwork { WifiNoNetwork = 0, WifiMainNetwork, WifiBackupNetwork };
 #define MAIN4INOSERVER_API_HOST_BASE "http://martinenhome.com/main4ino/prd"
 #endif // MAIN4INOSERVER_API_HOST_BASE 
 
-#ifndef UPDATE_FIRMWARE_URL_MAX_LENGTH
-#define UPDATE_FIRMWARE_URL_MAX_LENGTH 512
-#endif // UPDATE_FIRMWARE_URL_MAX_LENGTH
-
 #ifndef FACTOR_USEC_TO_SEC_DEEP_SLEEP
 #define FACTOR_USEC_TO_SEC_DEEP_SLEEP 1000000L
 #endif // FACTOR_USEC_TO_SEC_DEEP_SLEEP
