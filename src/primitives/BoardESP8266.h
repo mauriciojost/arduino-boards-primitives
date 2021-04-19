@@ -202,7 +202,6 @@ void reportFailureLogs() { // failures in previous life detected, report them no
   } else {
     // no crash, so abort should have taken place
     espWdtFeed();
-    bool abrt = readFile(ABORT_LOG_FILENAME, &fcontent);
     Buffer* fcontent = new Buffer(ABORT_LOG_FILE_MAX_LENGTH);
     bool abrt = readFile(ABORT_LOG_FILENAME, fcontent);
     if (abrt) {
