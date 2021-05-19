@@ -13,11 +13,25 @@ pipeline {
     stage('Build & deliver') {
       agent { docker 'mauriciojost/arduino-ci:python-python_3.6-platformio-5.1.1-gcovr-4.1' }
       stages {
+
+        stage('Update build refs') {
+          steps {
+            script {
+              def libraryjson = readJSON file: 'library.json'
+              def vers = libraryjson['version']
+              def buildId = env.BUILD_ID
+              currentBuild.displayName = "#$buildId - $vers"
+            }
+          }
+        }
+
         stage('Pull dependencies') {
           steps {
             script {
               sshagent(['bitbucket_key']) {
                 wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+                  sh 'git submodule update --init --recursive'
+                  sh '.mavarduino/create_links'
                   sh 'export GIT_COMMITTER_NAME=jenkinsbot && export GIT_COMMITTER_EMAIL=mauriciojostx@gmail.com && set && ./pull_dependencies -p -l'
                 }
               }
