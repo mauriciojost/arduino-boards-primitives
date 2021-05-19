@@ -11,7 +11,7 @@ pipeline {
 
   stages {
     stage('Build & deliver') {
-      agent { docker 'mauriciojost/arduino-ci:platformio-3.5.3-0.2.0' }
+      agent { docker 'mauriciojost/arduino-ci:python-python_3.6-platformio-5.1.1-gcovr-4.1' }
       stages {
         stage('Pull dependencies') {
           steps {
