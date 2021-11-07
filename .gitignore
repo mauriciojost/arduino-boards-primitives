@@ -141,3 +141,5 @@
 /src/Adafruit_PCD8544.h
 /src/Stream.cpp
 /src/Stream.h
+/.pio/
+/exports/
