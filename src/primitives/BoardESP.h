@@ -50,10 +50,10 @@ WifiNetwork detectWifi(const char *ssid, const char *ssidb) {
       espWdtFeed();
       String s = WiFi.SSID(i);
       if (strcmp(s.c_str(), ssid) == 0) {
-        log(CLASS_ESP, Debug, "Wifi found '%s'", ssid);
+        log(CLASS_ESP, Debug, "Wifi1 found '%s'", ssid);
         return WifiMainNetwork;
       } else if (strcmp(s.c_str(), ssidb) == 0) {
-        log(CLASS_ESP, Debug, "Wifi found '%s'", ssidb);
+        log(CLASS_ESP, Debug, "Wifi2 found '%s'", ssidb);
         return WifiBackupNetwork;
       }
     }

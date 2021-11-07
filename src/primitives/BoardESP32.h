@@ -50,6 +50,7 @@ bool initializeWifi(const char *ssid, const char *pass, const char *ssidb, const
       WiFi.begin(ssidb, passb);
       break;
     default:
+      log(CLASS_ESPX, Error, "Unexpected WIFI");
       return false;
   }
 
