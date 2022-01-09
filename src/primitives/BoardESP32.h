@@ -148,7 +148,8 @@ void deepSleepNotInterruptableSecsRaw(time_t t) {
 }
 
 bool wasHardwareReset() {
-  return (ESP.getResetInfoPtr()->reason == REASON_EXT_SYS_RST);
+  //return (ESP.getResetInfoPtr()->reason == REASON_EXT_SYS_RST); // not supported
+  return false;
 }
 
 int failuresInPast() {
