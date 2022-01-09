@@ -37,6 +37,8 @@ static_assert(ABORT_LOG_HEADER_LENGTH + STACKTRACE_MAX_LENGTH <= NW_LOG_BUFFER_M
 
 void espWdtFeed();
 
+bool wasHardwareReset();
+
 CustomHTTPClient httpClient;
 std::function<void ()> httpClientEnd = []() { httpClient.end();};
 

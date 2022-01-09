@@ -164,6 +164,10 @@ void deepSleepNotInterruptableSecsRaw(time_t t) {
   ESP.deepSleep(t * FACTOR_USEC_TO_SEC_DEEP_SLEEP, WAKE_RF_DEFAULT);
 }
 
+bool wasHardwareReset() {
+  return (ESP.getResetInfoPtr()->reason == REASON_EXT_SYS_RST);
+}
+
 int failuresInPast() {
   // Useful links for debugging:
   // https://links2004.github.io/Arduino/dc/deb/md_esp8266_doc_exception_causes.html
